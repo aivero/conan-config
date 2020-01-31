@@ -22,4 +22,5 @@ def pre_package_info(output, conanfile, reference, **kwargs):
 
     lib_path = os.path.join(conanfile.cpp_info.rootpath, "lib")
     if os.path.isdir(lib_path):
+        conanfile.env_info.LIBRARY_PATH.append(lib_path)
         conanfile.env_info.LD_LIBRARY_PATH.append(lib_path)
