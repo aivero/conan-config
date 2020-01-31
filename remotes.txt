@@ -1,1 +1,3 @@
-aivero https://conan.aa.aivero.dev/artifactory/api/conan/aivero-all True
+aivero-all https://conan.aa.aivero.dev/artifactory/api/conan/aivero-all True
+aivero-internal https://conan.aa.aivero.dev/artifactory/api/conan/aivero-internal True
+aivero-public https://conan.aa.aivero.dev/artifactory/api/conan/aivero-public True
