@@ -7,11 +7,12 @@ def remove_folder(folder):
     if os.path.isdir(folder):
         shutil.rmtree(folder)
 
+
 def post_package(output, conanfile, conanfile_path, **kwargs):
     assert conanfile
     # Delete libtool files
     for f in glob.glob(os.path.join(conanfile.package_folder, "**", "*.la"), recursive=True):
         os.remove(f)
     # Delete unneeded folders in share
-    for folder in ("man", "doc", "bash-completion", "gtk-doc"):
+    for folder in ("man", "doc", "gtk-doc"):
         remove_folder(os.path.join(conanfile.package_folder, "share", folder))
