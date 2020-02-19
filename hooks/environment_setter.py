@@ -3,14 +3,6 @@ import os
 from conans import tools
 
 
-def env_prepend(var, val, sep=os.pathsep):
-    os.environ[var] = val + (sep + os.environ[var] if var in os.environ else "")
-
-
-def pre_build(output, conanfile, **kwargs):
-    env_prepend("PKG_CONFIG_PATH", conanfile.build_folder, ":")
-
-
 def pre_package_info(output, conanfile, reference, **kwargs):
     assert conanfile
 
@@ -28,3 +20,11 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     share_path = os.path.join(conanfile.cpp_info.rootpath, "share")
     if os.path.isdir(share_path):
         conanfile.env_info.XDG_DATA_DIRS.append(share_path)
+
+    pc_paths = [
+        os.path.join(conanfile.cpp_info.rootpath, "lib", "pkgconfig"),
+        os.path.join(conanfile.cpp_info.rootpath, "share", "pkgconfig"),
+    ]
+    for pc_path in pc_paths:
+        if os.path.isdir(pc_path):
+            conanfile.env_info.PKG_CONFIG_PATH.append(pc_path)
