@@ -18,10 +18,14 @@ def pre_build(output, conanfile, **kwargs):
         "-fdebug-prefix-map=%s=%s" % (conanfile.source_folder, conanfile.name),
         " ",
     )
-
     env_prepend(
         "CXXFLAGS",
         "-fdebug-prefix-map=%s=%s" % (conanfile.source_folder, conanfile.name),
+        " ",
+    )
+    env_prepend(
+        "RUSTFLAGS",
+        "--remap-path-prefix=%s=%s" % (conanfile.source_folder, conanfile.name),
         " ",
     )
 
@@ -33,7 +37,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             and conanfile.settings.build_type == "Debug"  # Only for Debug build_type
             ):
         return
-    for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx"):
+    for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs"):
         conanfile.copy("*." + ext, "src")
 
 
