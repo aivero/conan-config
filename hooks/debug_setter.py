@@ -37,7 +37,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             and conanfile.settings.build_type == "Debug"  # Only for Debug build_type
             ):
         return
-    for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs"):
+    for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs", "y", "l"):
         conanfile.copy("*." + ext, "src")
 
 
