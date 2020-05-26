@@ -1,7 +1,14 @@
 # Conan config
 This repository contains all the shared conan configuration.
 
-Install: `conan config install git@gitlab.com:aivero/public/conan/conan-config.git`
+## Install
+### Install config
+`conan config install git@gitlab.com:aivero/public/conan/conan-config.git`
+
+### Set platform profile
+- x86_64: `conan config set general.default_profile=linux_x86_64`
+- armv8: `conan config set general.default_profile=linux_armv8`
+
 
 ## Overview:
 - `conan.conf`: Global configuration for Conan.
