@@ -6,8 +6,9 @@ def replace_prefix_in_pc_file(pc_file, prefix):
         old_prefix = ""
         # Get old prefix
         for l in f:
-            if l == "prefix=":
-                return f.read().replace("prefix=", "prefix=%s".format(prefix))
+            if l == "prefix=\n":
+                f.seek(0)
+                return f.read().replace("prefix=", "prefix={}".format(prefix))
             if "prefix=" in l:
                 old_prefix = l.split("=")[1][:-1]
                 break
@@ -23,9 +24,7 @@ def replace_prefix_in_pc_file(pc_file, prefix):
         if not old_prefix:
             raise Exception("Could not find package prefix in '%s'" % pc_file)
         f.seek(0)
-        content = f.read().replace(old_prefix, prefix)
-    with open(pc_file, 'w') as f:
-        f.write(content)
+        return f.read().replace(old_prefix, prefix)
 
 
 def post_download_package(output, conanfile_path, reference, package_id, remote, **kwargs):
@@ -39,4 +38,7 @@ def post_download_package(output, conanfile_path, reference, package_id, remote,
         if not os.path.isdir(pc_path):
             continue
         for pc in os.listdir(pc_path):
-            replace_prefix_in_pc_file(os.path.join(pc_path, pc), rootpath)
+            pc_file = os.path.join(pc_path, pc)
+            content = replace_prefix_in_pc_file(pc_file, rootpath)
+            with open(pc_file, 'w') as f:
+                f.write(content)
