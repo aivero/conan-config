@@ -17,6 +17,9 @@ def pre_package_info(output, conanfile, reference, **kwargs):
         if os.path.isdir(lib_path):
             conanfile.env_info.LIBRARY_PATH.append(lib_path)
             conanfile.env_info.LD_LIBRARY_PATH.append(lib_path)
+            python_lib_paths = [f.path for f in os.scandir(lib_path) if f.is_dir() and f.name.startswith("python")]
+            for python_lib_path in python_lib_paths:
+                conanfile.env_info.PYTHONPATH.append(os.path.join(python_lib_path, "site-packages"))
 
         share_path = os.path.join(conanfile.cpp_info.rootpath, "share")
         if os.path.isdir(share_path):
