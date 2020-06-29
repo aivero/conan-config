@@ -6,7 +6,7 @@ arch_build=armv8
 compiler=clang
 compiler.version=10
 compiler.libcxx=libstdc++11
-build_type=RelWithDebInfog
+build_type=RelWithDebInfo
 [options]
 [build_requires]
 [env]
