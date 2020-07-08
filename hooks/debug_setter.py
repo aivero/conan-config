@@ -35,17 +35,17 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     for root, dirs, files in os.walk(os.path.join(conanfile.package_folder, "lib")):
         for file in files:
             if regex.match(file):
-                os.system(f"strip -g {os.path.join(root, file)}")
+                os.system(f"strip -g --strip-unneeded {os.path.join(root, file)}")
 
     # Strip bin
     for root, dirs, files in os.walk(os.path.join(conanfile.package_folder, "bin")):
         for file in files:
-            os.system(f"strip -g {os.path.join(root, file)}")
+            os.system(f"strip -g --strip-unneeded {os.path.join(root, file)}")
 
     # Strip libexec
     for root, dirs, files in os.walk(os.path.join(conanfile.package_folder, "libexec")):
         for file in files:
-            os.system(f"strip -g {os.path.join(root, file)}")
+            os.system(f"strip -g --strip-unneeded {os.path.join(root, file)}")
 
     # Copy sources to package
     for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs", "y", "l"):
