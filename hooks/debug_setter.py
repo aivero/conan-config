@@ -48,8 +48,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             os.system(f"strip -g --strip-unneeded {os.path.join(root, file)}")
 
     # Copy sources to package
-    for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs", "y", "l"):
-        conanfile.copy("*." + ext, "src")
+    # for ext in ("c", "cpp", "cpp", "h", "hpp", "hxx", "rs", "y", "l"):
+    #    conanfile.copy("*." + ext, "src")
 
 
 def pre_package_info(output, conanfile, reference, **kwargs):
