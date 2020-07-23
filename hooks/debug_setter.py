@@ -31,7 +31,7 @@ def pre_build(output, conanfile, **kwargs):
 def post_package(output, conanfile, conanfile_path, **kwargs):
     assert conanfile
     # Strip lib
-    regex = re.compile(".*\.(so|a)")
+    regex = re.compile(".*\.so.*")
     for root, dirs, files in os.walk(os.path.join(conanfile.package_folder, "lib")):
         for file in files:
             if regex.match(file):
