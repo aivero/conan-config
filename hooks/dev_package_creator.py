@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import sys
 
 template = """
 from conans import *
@@ -90,7 +91,5 @@ def pre_package_info(output, conanfile, reference, **kwargs):
                 c.name, c.version, license_to_str(c.license), setting_to_str(c.settings)
             )
             cfile.write(content)
-            print(dir(c.settings))
-            print(setting_to_str(c.settings))
 
-        os.system(f"conan create {recipe_folder}")
+        os.system(f"{sys.argv[0]} create {recipe_folder}")
