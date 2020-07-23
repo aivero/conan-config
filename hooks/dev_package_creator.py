@@ -48,7 +48,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 rel_path = os.path.relpath(root, lib_folder)
                 file_path = os.path.join(lib_folder, rel_path, file)
                 file_dest_path = os.path.join(files_folder, "lib", rel_path, file)
-                os.makedirs(os.path.dirname(file_dest_path))
+                if os.path.exists(os.path.dirname(file_dest_path)):
+                    os.makedirs(os.path.dirname(file_dest_path))
                 shutil.move(file_path, file_dest_path)
 
     # Move pkg-config files
@@ -59,7 +60,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 rel_path = os.path.relpath(root, package_folder)
                 file_path = os.path.join(package_folder, rel_path, file)
                 file_dest_path = os.path.join(files_folder, rel_path, file)
-                os.makedirs(os.path.dirname(file_dest_path))
+                if os.path.exists(os.path.dirname(file_dest_path)):
+                    os.makedirs(os.path.dirname(file_dest_path))
                 shutil.move(file_path, file_dest_path)
 
 
