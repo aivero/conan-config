@@ -86,7 +86,6 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     recipe_folder = os.path.join(
         build_folder, f"{conanfile.name}-{conanfile.version}-dev"
     )
-    files_folder = os.path.join(recipe_folder, "files")
     if os.path.exists(recipe_folder):
         with open(os.path.join(recipe_folder, "conanfile.py"), "w") as cfile:
             content = template.format(
@@ -95,3 +94,4 @@ def pre_package_info(output, conanfile, reference, **kwargs):
             cfile.write(content)
 
         os.system(f"{sys.argv[0]} create {recipe_folder}")
+    shutil.rmtree(recipe_folder)
