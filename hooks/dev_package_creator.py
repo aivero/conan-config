@@ -94,4 +94,4 @@ def pre_package_info(output, conanfile, reference, **kwargs):
             cfile.write(content)
 
         os.system(f"{sys.argv[0]} create {recipe_folder}")
-    shutil.rmtree(recipe_folder)
+        shutil.rmtree(recipe_folder)
