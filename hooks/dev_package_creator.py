@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import sys
+import pathlib
 
 template = """
 from conans import *
@@ -32,6 +33,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     recipe_folder = os.path.join(
         conanfile.build_folder, f"{conanfile.name}-{conanfile.version}-dev"
     )
+    dev_lockfile = os.path.join(recipe_folder, "lockfile")
+    pathlib.Path(dev_lockfile).touch()
     files_folder = os.path.join(recipe_folder, "files")
 
     # Move include
@@ -82,16 +85,14 @@ def setting_to_str(setting):
 def pre_package_info(output, conanfile, reference, **kwargs):
     c = conanfile
 
-    build_folder = conanfile.package_folder.replace("/package/", "/build/")
-    recipe_folder = os.path.join(
-        build_folder, f"{conanfile.name}-{conanfile.version}-dev"
-    )
-    if os.path.exists(recipe_folder):
+    build_folder = c.package_folder.replace("/package/", "/build/")
+    recipe_folder = os.path.join(build_folder, f"{c.name}-{c.version}-dev")
+    dev_lockfile = os.path.join(recipe_folder, "lockfile")
+    if os.path.exists(dev_lockfile):
+        os.remove(dev_lockfile)
         with open(os.path.join(recipe_folder, "conanfile.py"), "w") as cfile:
             content = template.format(
                 c.name, c.version, license_to_str(c.license), setting_to_str(c.settings)
             )
             cfile.write(content)
-
         os.system(f"{sys.argv[0]} create {recipe_folder}")
-        shutil.rmtree(recipe_folder)
