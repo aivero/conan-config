@@ -34,8 +34,14 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
         conanfile.build_folder, f"{conanfile.name}-{conanfile.version}-dev"
     )
     dev_lockfile = os.path.join(recipe_folder, "lockfile")
-    pathlib.Path(dev_lockfile).touch()
     files_folder = os.path.join(recipe_folder, "files")
+
+    # Create folder for dev package files
+    if not os.path.exists(os.path.dirname(files_folder)):
+        os.makedirs(files_folder)
+
+    # Create lockfile
+    pathlib.Path(dev_lockfile).touch()
 
     # Move include
     include_folder = os.path.join(package_folder, "include")
