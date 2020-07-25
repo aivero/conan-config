@@ -76,6 +76,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
 
 def license_to_str(license):
     res = ""
+    if type(license) == str:
+        license = [license]
     for l in license:
         res += f' "{l}",'
     return res
