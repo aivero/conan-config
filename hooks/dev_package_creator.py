@@ -95,8 +95,9 @@ def pre_package_info(output, conanfile, reference, **kwargs):
 
     build_folder = c.package_folder.replace("/package/", "/build/")
     recipe_folder = os.path.join(build_folder, f"{c.name}-{c.version}-dev")
+    files_folder = os.path.join(recipe_folder, "files")
     dev_lockfile = os.path.join(recipe_folder, "lockfile")
-    if os.path.exists(dev_lockfile):
+    if os.path.exists(dev_lockfile) and os.listdir(files_folder):
         os.remove(dev_lockfile)
         with open(os.path.join(recipe_folder, "conanfile.py"), "w") as cfile:
             content = template.format(
