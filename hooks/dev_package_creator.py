@@ -29,6 +29,10 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     if conanfile.name.endswith("-dev"):
         return
 
+    # Don't create dev package for bootstrap packages
+    if conanfile.name.endswith("-bootstrap"):
+        return
+
     package_folder = conanfile.package_folder
     recipe_folder = os.path.join(
         conanfile.build_folder, f"{conanfile.name}-{conanfile.version}-dev"
@@ -92,6 +96,10 @@ def setting_to_str(setting):
 
 def pre_package_info(output, conanfile, reference, **kwargs):
     c = conanfile
+
+    # Don't create dev package for bootstrap packages
+    if c.name.endswith("-bootstrap"):
+        return
 
     build_folder = c.package_folder.replace("/package/", "/build/")
     recipe_folder = os.path.join(build_folder, f"{c.name}-{c.version}-dev")
