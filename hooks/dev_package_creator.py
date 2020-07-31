@@ -30,7 +30,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
         return
 
     # Don't create dev package for bootstrap packages
-    if conanfile.name.endswith("-bootstrap"):
+    if conanfile.name.startsswith("bootstrap-"):
         return
 
     package_folder = conanfile.package_folder
@@ -98,7 +98,7 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     c = conanfile
 
     # Don't create dev package for bootstrap packages
-    if c.name.endswith("-bootstrap"):
+    if c.name.startsswith("bootstrap-"):
         return
 
     build_folder = c.package_folder.replace("/package/", "/build/")
