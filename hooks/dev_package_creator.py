@@ -98,7 +98,7 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     c = conanfile
 
     # Don't create dev package for bootstrap packages
-    if c.name.startsswith("bootstrap-"):
+    if c.name.startswith("bootstrap-"):
         return
 
     build_folder = c.package_folder.replace("/package/", "/build/")
