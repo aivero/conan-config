@@ -94,7 +94,7 @@ def setting_to_str(setting):
     return res
 
 
-def pre_package_info(output, conanfile, reference, **kwargs):
+def post_package_info(output, conanfile, reference, **kwargs):
     c = conanfile
 
     # Don't create dev package for bootstrap packages
@@ -112,3 +112,4 @@ def pre_package_info(output, conanfile, reference, **kwargs):
                 c.name, c.version, license_to_str(c.license), setting_to_str(c.settings)
             )
             cfile.write(content)
+        os.system(f"{sys.argv[0]} create {recipe_folder}")
