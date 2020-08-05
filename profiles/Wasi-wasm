@@ -5,7 +5,6 @@ arch=wasm
 arch_build=x86_64
 compiler=clang
 compiler.version=10
-compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=system
 libc_build=system
