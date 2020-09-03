@@ -90,7 +90,8 @@ def license_to_str(license):
 def setting_to_str(setting):
     res = ""
     for (key, val) in setting.items():
-        res += f' "{key}",'
+        if not "." in key:
+            res += f' "{key}",'
     return res
 
 
