@@ -19,7 +19,7 @@ class Conan(ConanFile):
     )
 
     def package(self):
-        self.copy(pattern="files/*")
+        self.copy("*", src="files")
 """
 
 
