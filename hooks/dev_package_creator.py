@@ -25,8 +25,8 @@ class Conan(ConanFile):
 
 def post_package(output, conanfile, conanfile_path, **kwargs):
     assert conanfile
-    # Don't create dev package for packages already ending with -dev
-    if conanfile.name.endswith("-dev"):
+    # Don't create dev package for packages already ending with -dev or -dbg
+    if conanfile.name.endswith("-dev") or conanfile.name.endswith("-dbg"):
         return
 
     # Don't create dev package for bootstrap packages
@@ -53,7 +53,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
         shutil.move(include_folder, os.path.join(files_folder, "include"))
 
     # Move static libs
-    regex = re.compile(".*\.a")
+    regex = re.compile(r".*\.a")
     lib_folder = os.path.join(package_folder, "lib")
     for root, dirs, files in os.walk(lib_folder):
         for file in files:
@@ -66,7 +66,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 shutil.move(file_path, file_dest_path)
 
     # Move pkg-config files
-    regex = re.compile(".*\.pc")
+    regex = re.compile(r".*\.pc")
     for root, dirs, files in os.walk(package_folder):
         for file in files:
             if regex.match(file):
@@ -96,21 +96,24 @@ def setting_to_str(setting):
 
 
 def post_package_info(output, conanfile, reference, **kwargs):
-    c = conanfile
-
     # Don't create dev package for bootstrap packages
-    if c.name.startswith("bootstrap-"):
+    if conanfile.name.startswith("bootstrap-"):
         return
 
-    build_folder = c.package_folder.replace("/package/", "/build/")
-    recipe_folder = os.path.join(build_folder, f"{c.name}-{c.version}-dev")
+    build_folder = conanfile.package_folder.replace("/package/", "/build/")
+    recipe_folder = os.path.join(
+        build_folder, f"{conanfile.name}-{conanfile.version}-dev"
+    )
     files_folder = os.path.join(recipe_folder, "files")
     dev_lockfile = os.path.join(recipe_folder, "lockfile")
     if os.path.exists(dev_lockfile) and os.listdir(files_folder):
         os.remove(dev_lockfile)
         with open(os.path.join(recipe_folder, "conanfile.py"), "w") as cfile:
             content = template.format(
-                c.name, c.version, license_to_str(c.license), setting_to_str(c.settings)
+                conanfile.name,
+                conanfile.version,
+                license_to_str(conanfile.license),
+                setting_to_str(conanfile.settings),
             )
             cfile.write(content)
         os.system(f"{sys.argv[0]} create {recipe_folder}")
