@@ -80,7 +80,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     # Create lockfile
     pathlib.Path(lockfile).touch()
 
-    # Strip binaries and create debug files
+    # Strip binaries
     paths = (
         ("lib", r".*\.so.*"),
         ("bin", r".*"),
@@ -94,11 +94,15 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                     debug_path = os.path.join(files_folder, "dbg", root[1:])
                     if not os.path.exists(os.path.dirname(debug_path)):
                         os.makedirs(debug_path)
-                    bin_file = os.path.join(root, file)
                     debug_file = f"{os.path.join(debug_path, file)}.debug"
-                    os.system(f"objcopy --only-keep-debug {bin_file} {debug_file}")
-                    os.system(f"strip -g {bin_file}")
-                    os.system(f"objcopy --add-gnu-debuglink={debug_file} {bin_file}")
+                    print("dfile:" + str(debug_file))
+                    os.system(
+                        f"objcopy --only-keep-debug {os.path.join(root, file)} {debug_file}"
+                    )
+                    os.system(f"strip -g {os.path.join(root, file)}")
+                    os.system(
+                        f"objcopy --add-gnu-debuglink={debug_file} {os.path.join(root, file)}"
+                    )
 
     # Copy sources to package
     regex = re.compile(r".*\.(c|C|cc|cpp|cxx|c\+\+|h|H|hh|hpp|hxx|h\+\+|rs|y|l)$")
@@ -156,4 +160,7 @@ def post_package_info(output, conanfile, reference, **kwargs):
                 setting_to_str(conanfile.settings),
             )
             cfile.write(content)
-        os.system(f"{sys.argv[0]} create {recipe_folder}")
+        ret = os.system(f"{sys.argv[0]} create {recipe_folder}")
+        print(f"Create return value ({c.name}-dev): {ret}")
+        if ret != 0:
+            raise Exception(f"Could create package {c.name}-dbg")
