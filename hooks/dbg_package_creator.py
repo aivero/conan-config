@@ -14,9 +14,6 @@ class Conan(ConanFile):
     description = "{0} debug files"
     settings ={3}
     exports_sources = ["files/*"]
-    requires = (
-        "{0}/{1}"
-    )
 
     def package(self):
         self.copy("*", src="files")
