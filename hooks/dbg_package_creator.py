@@ -1,10 +1,9 @@
 import os
 import re
 import shutil
-import sys
 import pathlib
 
-template = """
+TEMPLATE = """
 import os
 from conans import *
 
@@ -35,6 +34,7 @@ def env_prepend(var, val, sep=os.pathsep):
 
 def pre_build(output, conanfile, **kwargs):
     assert conanfile
+
     # Set debug prefix flags
     if not hasattr(conanfile, "source_folder"):  # Needs source directory
         return
@@ -80,7 +80,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     # Create lockfile
     pathlib.Path(lockfile).touch()
 
-    # Strip binaries
+    # Strip binaries and create debug files
     paths = (
         ("lib", r".*\.so.*"),
         ("bin", r".*"),
@@ -94,15 +94,11 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                     debug_path = os.path.join(files_folder, "dbg", root[1:])
                     if not os.path.exists(os.path.dirname(debug_path)):
                         os.makedirs(debug_path)
+                    bin_file = os.path.join(root, file)
                     debug_file = f"{os.path.join(debug_path, file)}.debug"
-                    print("dfile:" + str(debug_file))
-                    os.system(
-                        f"objcopy --only-keep-debug {os.path.join(root, file)} {debug_file}"
-                    )
-                    os.system(f"strip -g {os.path.join(root, file)}")
-                    os.system(
-                        f"objcopy --add-gnu-debuglink={debug_file} {os.path.join(root, file)}"
-                    )
+                    os.system(f"objcopy --only-keep-debug {bin_file} {debug_file}")
+                    os.system(f"strip -g {bin_file}")
+                    os.system(f"objcopy --add-gnu-debuglink={debug_file} {bin_file}")
 
     # Copy sources to package
     regex = re.compile(r".*\.(c|C|cc|cpp|cxx|c\+\+|h|H|hh|hpp|hxx|h\+\+|rs|y|l)$")
@@ -120,18 +116,18 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 shutil.move(file_path, file_dest_path)
 
 
-def license_to_str(license):
+def license_to_str(licenses):
     res = ""
-    if type(license) == str:
-        license = [license]
-    for l in license:
-        res += f' "{l}",'
+    if isinstance(licenses, str):
+        licenses = [licenses]
+    for lic in licenses:
+        res += f' "{lic}",'
     return res
 
 
 def setting_to_str(setting):
     res = ""
-    for (key, val) in setting.items():
+    for (key, _) in setting.items():
         if not "." in key:
             res += f' "{key}",'
     return res
@@ -153,14 +149,14 @@ def post_package_info(output, conanfile, reference, **kwargs):
     if os.path.exists(lockfile) and os.listdir(files_folder):
         os.remove(lockfile)
         with open(os.path.join(recipe_folder, "conanfile.py"), "w") as cfile:
-            content = template.format(
+            content = TEMPLATE.format(
                 conanfile.name,
                 conanfile.version,
                 license_to_str(conanfile.license),
                 setting_to_str(conanfile.settings),
             )
             cfile.write(content)
-        ret = os.system(f"{sys.argv[0]} create {recipe_folder}")
+        ret = os.system(f"conan create {recipe_folder}")
         print(f"Create return value ({conanfile.name}-dev): {ret}")
         if ret != 0:
             raise Exception(f"Could create package {conanfile.name}-dbg")
