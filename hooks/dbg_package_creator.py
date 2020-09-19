@@ -161,6 +161,6 @@ def post_package_info(output, conanfile, reference, **kwargs):
             )
             cfile.write(content)
         ret = os.system(f"{sys.argv[0]} create {recipe_folder}")
-        print(f"Create return value ({c.name}-dev): {ret}")
+        print(f"Create return value ({conanfile.name}-dev): {ret}")
         if ret != 0:
-            raise Exception(f"Could create package {c.name}-dbg")
+            raise Exception(f"Could create package {conanfile.name}-dbg")
