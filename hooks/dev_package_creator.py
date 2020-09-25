@@ -60,11 +60,6 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     if not conanfile.name.endswith("-dev"):
         return
 
-    # Check option to disable development package creation
-    if hasattr(conanfile, "create_dev_package"):
-        if not conanfile.create_dev_package:
-            return
-
     with open(conanfile_path, "w") as cfile:
         content = TEMPLATE.format(
             conanfile.name[:-4],
