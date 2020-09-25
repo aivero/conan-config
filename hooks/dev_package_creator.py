@@ -23,12 +23,12 @@ class Conan(ConanFile):
     def package(self):
         pkg_rootpath = self.deps_cpp_info["{0}"].rootpath
 
-        # Move include
+        # Copy include
         include_folder = os.path.join(pkg_rootpath, "include")
         if os.path.exists(include_folder):
            shutil.copytree(include_folder, os.path.join(self.package_folder, "include"))
 
-        # Move static libs
+        # Copy static libs
         regex = re.compile(".*\.a")
         lib_folder = os.path.join(pkg_rootpath, "lib")
         for root, dirs, files in os.walk(lib_folder):
@@ -41,7 +41,7 @@ class Conan(ConanFile):
                         os.makedirs(os.path.dirname(file_dest_path))
                     shutil.copy(file_path, file_dest_path)
 
-        # Move pkg-config files
+        # Copy pkg-config files
         regex = re.compile(".*\.pc")
         for root, dirs, files in os.walk(pkg_rootpath):
            for file in files:

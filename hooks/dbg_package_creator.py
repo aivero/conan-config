@@ -22,7 +22,7 @@ class Conan(ConanFile):
     def package(self):
         pkg_rootpath = self.deps_cpp_info["{0}"].rootpath
 
-        # Move src, dbg
+        # Copy src and dbg
         for folder in ("src", "dbg"):
             path = os.path.join(pkg_rootpath, folder)
             if os.path.exists(path):
