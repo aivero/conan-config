@@ -16,6 +16,10 @@ class Conan(ConanFile):
     settings = {3}
     build_requires = "{0}/{1}"
 
+    # Avoid warning about missing package method
+    def package(self):
+        pass
+
     def package(self):
         pkg_rootpath = self.deps_cpp_info["{0}"].rootpath
 
