@@ -134,8 +134,8 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
     # Don't cleanup package for bootstrap, development and debug packages
     if (
         reference.name.startswith("bootstrap-")
-        and reference.name.endswith("-dev")
-        and reference.name.endswith("-dbg")
+        or reference.name.endswith("-dev")
+        or reference.name.endswith("-dbg")
     ):
         return
 
