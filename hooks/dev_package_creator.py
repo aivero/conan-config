@@ -60,10 +60,6 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     if not conanfile.name.endswith("-dev"):
         return
 
-    # Don't create dev package for bootstrap packages
-    if conanfile.name.startswith("bootstrap-"):
-        return
-
     with open(conanfile_path, "w") as cfile:
         content = TEMPLATE.format(
             conanfile.name[:-4],
@@ -79,12 +75,8 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
         "export/conanfile.py", f"package/{package_id}"
     )
 
-    # Don't cleanup package for bootstrap, development and debug packages
-    if (
-        reference.name.startswith("bootstrap-")
-        or reference.name.endswith("-dev")
-        or reference.name.endswith("-dbg")
-    ):
+    # Don't cleanup package for development and debug packages
+    if reference.name.endswith("-dev") or reference.name.endswith("-dbg"):
         return
 
     # Delete include
