@@ -92,7 +92,7 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
     if os.path.exists(include_folder):
         shutil.rmtree(include_folder)
 
-    # delete static libs
+    # Delete static libs
     regex = re.compile(r".*\.a")
     lib_folder = os.path.join(package_folder, "lib")
     for root, _, files in os.walk(lib_folder):
@@ -102,7 +102,7 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
                 file_path = os.path.join(lib_folder, rel_path, file)
                 os.remove(file_path)
 
-    # Move pkg-config files
+    # Delete pkg-config files
     regex = re.compile(r".*\.pc")
     for root, _, files in os.walk(package_folder):
         for file in files:

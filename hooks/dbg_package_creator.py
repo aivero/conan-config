@@ -143,7 +143,7 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
     ):
         return
 
-    # Move src, dbg
+    # Delete src, dbg
     for folder in ("src", "dbg"):
         path = os.path.join(package_folder, folder)
         if os.path.exists(path):
