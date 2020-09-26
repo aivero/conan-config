@@ -45,9 +45,8 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
         return
 
     # Check option to disable debug package creation
-    if getattr(conanfile, "create_dbg_package", True):
-        if not conanfile.create_dbg_package:
-            return
+    if not getattr(conanfile, "create_dbg_package", True):
+        return
 
     with open(conanfile_path, "w") as cfile:
         content = TEMPLATE.format(
