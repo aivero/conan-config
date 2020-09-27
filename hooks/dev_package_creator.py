@@ -85,7 +85,7 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
 
     # Check if dev package is disabled by conanfile
     with open(conanfile_path) as conanfile:
-        if "no_dev_pkg = True" in conanfile.read():
+        if conanfile.read().find("no_dev_pkg = True"):
             return
 
     # Delete include
