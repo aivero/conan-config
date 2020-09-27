@@ -61,7 +61,7 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
         return
 
     # Check option to disable use of template for development package
-    if not getattr(conanfile, "dev_pkg_template", True):
+    if not getattr(conanfile, "only_dev_pkg", True):
         return
 
     with open(conanfile_path, "w") as cfile:
