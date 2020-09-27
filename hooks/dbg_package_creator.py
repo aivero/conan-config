@@ -95,7 +95,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             for file in files:
                 if regex.match(file):
                     debug_path = os.path.join(conanfile.package_folder, "dbg", root[1:])
-                    if not os.path.exists(os.path.dirname(debug_path)):
+                    if not os.path.exists(debug_path):
                         os.makedirs(debug_path)
                     debug_file = f"{os.path.join(debug_path, file)}.debug"
                     # Extract debug info to debug file
