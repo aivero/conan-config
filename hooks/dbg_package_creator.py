@@ -46,7 +46,7 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
 
     # For development only packages use development package as source
     src_pkg = conanfile.name[:-4]
-    if getattr(conanfile, "only_dev_pkg"):
+    if getattr(conanfile, "only_dev_pkg", False):
         src_pkg += "-dev"
 
     with open(conanfile_path, "w") as cfile:
