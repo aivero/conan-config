@@ -60,8 +60,8 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     if not conanfile.name.endswith("-dev"):
         return
 
-    # Check option to disable use of template for development package
-    if getattr(conanfile, "only_dev_pkg", False):
+    # Check if dev package is disabled by conanfile
+    if getattr(conanfile, "no_dev_pkg", False):
         return
 
     with open(conanfile_path, "w") as cfile:
@@ -82,6 +82,11 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
     # Don't cleanup package for development and debug packages
     if reference.name.endswith("-dev") or reference.name.endswith("-dbg"):
         return
+
+    # Check if dev package is disabled by conanfile
+    with open(conanfile_path) as conanfile:
+        if "no_dev_pkg = True" in conanfile.read():
+            return
 
     # Delete include
     include_folder = os.path.join(package_folder, "include")

@@ -20,7 +20,7 @@ class Conan(ConanFile):
         pass
 
     def package(self):
-        pkg_rootpath = self.deps_cpp_info["{4}"].rootpath
+        pkg_rootpath = self.deps_cpp_info["{0}"].rootpath
 
         # Copy src and dbg
         for folder in ("src", "dbg"):
@@ -44,18 +44,12 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     if not conanfile.name.endswith("-dbg"):
         return
 
-    # For development only packages use development package as source
-    src_pkg = conanfile.name[:-4]
-    if getattr(conanfile, "only_dev_pkg", False):
-        src_pkg += "-dev"
-
     with open(conanfile_path, "w") as cfile:
         content = TEMPLATE.format(
             conanfile.name[:-4],
             conanfile.version,
             repr(conanfile.license),
             repr(conanfile.settings),
-            src_pkg,
         )
         cfile.write(content)
 
