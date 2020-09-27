@@ -22,6 +22,11 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
                 "    requires = (",
                 '    requires = (("generators/[^1.0.0]", "private"), ',
             )
+        elif "    requires = " in content:
+            content = content.replace(
+                "    requires = ",
+                '    requires = ("generators/[^1.0.0]", "private"), ',
+            )
         # No requires
         else:
             content = content.replace(
