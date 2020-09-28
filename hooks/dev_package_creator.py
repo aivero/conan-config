@@ -49,7 +49,7 @@ class Conan(ConanFile):
                if regex.match(file):
                    rel_path = os.path.relpath(root, pkg_rootpath)
                    file_path = os.path.join(pkg_rootpath, rel_path, file)
-                   file_dest_path = os.path.join(files_folder, rel_path, file)
+                   file_dest_path = os.path.join(self.package_folder, rel_path, file)
                    if not os.path.exists(os.path.dirname(file_dest_path)):
                        os.makedirs(os.path.dirname(file_dest_path))
                    shutil.copy(file_path, file_dest_path)
