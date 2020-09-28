@@ -29,8 +29,8 @@ class Conan(ConanFile):
         if os.path.exists(include_folder):
            shutil.copytree(include_folder, os.path.join(self.package_folder, "include"))
 
-        # Copy static libs
-        regex = re.compile(".*\.a")
+        # Copy static libs and object files
+        regex = re.compile(r".*\.(a|o)$")
         lib_folder = os.path.join(pkg_rootpath, "lib")
         for root, dirs, files in os.walk(lib_folder):
             for file in files:
@@ -43,7 +43,7 @@ class Conan(ConanFile):
                     shutil.copy(file_path, file_dest_path)
 
         # Copy pkg-config files
-        regex = re.compile(".*\.pc")
+        regex = re.compile(".*\.pc$")
         for root, dirs, files in os.walk(pkg_rootpath):
            for file in files:
                if regex.match(file):
@@ -103,8 +103,8 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
     if os.path.exists(include_folder):
         shutil.rmtree(include_folder)
 
-    # Delete static libs
-    regex = re.compile(r".*\.a")
+    # Delete static libs and object files
+    regex = re.compile(r".*\.(a|o)$")
     lib_folder = os.path.join(package_folder, "lib")
     for root, _, files in os.walk(lib_folder):
         for file in files:
@@ -114,7 +114,7 @@ def pre_upload_package(output, conanfile_path, reference, package_id, remote, **
                 os.remove(file_path)
 
     # Delete pkg-config files
-    regex = re.compile(r".*\.pc")
+    regex = re.compile(r".*\.pc$")
     for root, _, files in os.walk(package_folder):
         for file in files:
             if regex.match(file):
