@@ -14,6 +14,7 @@ class Conan(ConanFile):
     description = "{0} debug files"
     settings = {3}
     build_requires = "{0}/{1}"
+    requires = {4}
 
     # Avoid warning about missing build method
     def build(self):
@@ -44,12 +45,22 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     if not conanfile.name.endswith("-dbg"):
         return
 
+    # Find debug package requirements
+    reqs = getattr(conanfile, "requires", ()) + getattr(conanfile, "build_requires", ())
+    dbg_reqs = set()
+    for req in reqs:
+        name, version = req.split("/")
+        if name.endswith("-dev"):
+            name = name[:-4]
+        dbg_reqs.add(f"{name}-dbg/{version}")
+
     with open(conanfile_path, "w") as cfile:
         content = TEMPLATE.format(
             conanfile.name[:-4],
             conanfile.version,
             repr(conanfile.license),
             repr(conanfile.settings),
+            repr(tuple(dbg_reqs)),
         )
         cfile.write(content)
 
