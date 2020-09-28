@@ -55,17 +55,23 @@ class Conan(ConanFile):
                    shutil.copy(file_path, file_dest_path)
 """
 
+TEMPLATE_NO_DEV = """
+class Conan(ConanFile):
+    name = "{0}-dev"
+    version = "{1}"
+    license = {2}
+    description = "{0} development files"
+    settings = {3}
+    requires = ("{0}/{1}",) + {4}
+"""
+
 
 def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     # Only create developement package when ending with -dev
     if not conanfile.name.endswith("-dev"):
         return
 
-    # Check if dev package is disabled by conanfile
-    if getattr(conanfile, "no_dev_pkg", False):
-        return
-
-    # Find debug package requirements
+    # Find dev package requirements
     reqs = getattr(conanfile, "requires", ()) + getattr(conanfile, "build_requires", ())
     dev_reqs = set()
     for req in reqs:
@@ -73,8 +79,14 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
         if name.endswith("-dev"):
             dev_reqs.add(f"{name}/{version}")
 
+    # Check if dev package should be empty
+    if getattr(conanfile, "no_dev_pkg", False):
+        template = TEMPLATE_NO_DEV
+    else:
+        template = TEMPLATE
+
     with open(conanfile_path, "w") as cfile:
-        content = TEMPLATE.format(
+        content = template.format(
             conanfile.name[:-4],
             conanfile.version,
             repr(conanfile.license),
