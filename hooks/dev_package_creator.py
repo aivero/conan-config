@@ -56,6 +56,8 @@ class Conan(ConanFile):
 """
 
 TEMPLATE_NO_DEV = """
+from conans import *
+
 class Conan(ConanFile):
     name = "{0}-dev"
     version = "{1}"
