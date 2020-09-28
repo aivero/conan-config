@@ -74,18 +74,22 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
         return
 
     # Find dev package requirements
-    reqs = getattr(conanfile, "requires", ()) + getattr(conanfile, "build_requires", ())
+    dev_pkg = not getattr(conanfile, "no_dev_pkg", False)
     dev_reqs = set()
-    for req in reqs:
+    for req in getattr(conanfile, "requires", ()):
+        name, version = req.split("/")
+        if name.endswith("-dev") and dev_pkg:
+            dev_reqs.add(f"{name}/{version}")
+    for req in getattr(conanfile, "build_requires", ()):
         name, version = req.split("/")
         if name.endswith("-dev"):
             dev_reqs.add(f"{name}/{version}")
 
     # Check if dev package should be empty
-    if getattr(conanfile, "no_dev_pkg", False):
-        template = TEMPLATE_NO_DEV
-    else:
+    if dev_pkg:
         template = TEMPLATE
+    else:
+        template = TEMPLATE_NO_DEV
 
     with open(conanfile_path, "w") as cfile:
         content = template.format(
