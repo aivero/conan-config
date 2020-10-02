@@ -12,3 +12,5 @@ libc_build=musl
 [options]
 [build_requires]
 [env]
+CFLAGS=
+CXXFLAGS=
