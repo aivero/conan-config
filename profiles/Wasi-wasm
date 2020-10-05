@@ -12,5 +12,3 @@ libc_build=system
 [options]
 [build_requires]
 [env]
-CFLAGS=
-CXXFLAGS=
