@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import subprocess
 
 TEMPLATE = """
 import os
@@ -76,6 +77,15 @@ def pre_build(output, conanfile, **kwargs):
     )
 
 
+def run(exe, args):
+    if not shutil.which(exe):
+        return ("", f"Command '{exe}' not found", 127)
+    cmd = f"{exe} {' '.join(args)}"
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    return (stdout, stderr, proc.wait())
+
+
 def post_package(output, conanfile, conanfile_path, **kwargs):
     assert conanfile
 
@@ -93,23 +103,23 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
         regex = re.compile(path[1])
         for root, _, files in os.walk(os.path.join(conanfile.package_folder, path[0])):
             for file in files:
-                if regex.match(file):
-                    debug_path = os.path.join(conanfile.package_folder, "dbg", root[1:])
-                    if not os.path.exists(debug_path):
-                        os.makedirs(debug_path)
-                    debug_file = f"{os.path.join(debug_path, file)}.debug"
-                    # Extract debug info to debug file
-                    os.system(
-                        f"objcopy --only-keep-debug {os.path.join(root, file)} {debug_file}"
-                    )
-                    # Strip binary
-                    os.system(
-                        f"strip --strip-debug --strip-unneeded {os.path.join(root, file)}"
-                    )
-                    # Link binary to debug file
-                    os.system(
-                        f"objcopy --add-gnu-debuglink={debug_file} {os.path.join(root, file)}"
-                    )
+                if not regex.match(file):
+                    continue
+                dbg_path = os.path.join(conanfile.package_folder, "dbg", root[1:])
+                if not os.path.exists(dbg_path):
+                    os.makedirs(dbg_path)
+                dbg_file = f"{os.path.join(dbg_path, file)}.debug"
+                bin_file = os.path.join(root, file)
+                # Check if file has debug_info
+                stdout, _, _ = run("file", [bin_file])
+                if not b"debug_info" in stdout:
+                    continue
+                # Extract debug info to debug file
+                run("objcopy", ["--only-keep-debug", bin_file, dbg_file])
+                # Strip binary
+                run("strip", ["--strip-debug", "--strip-unneeded", bin_file])
+                # Link binary to debug file
+                run("objcopy", [f"--add-gnu-debuglink={dbg_file}", bin_file])
 
     # Copy sources to package
     regex = re.compile(r".*\.(c|C|cc|cpp|cxx|c\+\+|h|H|hh|hpp|hxx|h\+\+|rs|y|l)$")
