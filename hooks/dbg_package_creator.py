@@ -77,11 +77,16 @@ def pre_build(output, conanfile, **kwargs):
     )
 
 
-def run(exe, args):
+def run(exe, args=None, env=None):
+    if not args:
+        args = []
     if not shutil.which(exe):
         return ("", f"Command '{exe}' not found", 127)
     cmd = f"{exe} {' '.join(args)}"
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    if env or env == {}:
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, env=env)
+    else:
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     return (stdout, stderr, proc.wait())
 
@@ -111,7 +116,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 dbg_file = f"{os.path.join(dbg_path, file)}.debug"
                 bin_file = os.path.join(root, file)
                 # Check if file has debug_info
-                stdout, _, _ = run("file", [bin_file])
+                stdout, _, _ = run("file", [bin_file], {})
                 if not b"debug_info" in stdout:
                     continue
                 # Extract debug info to debug file
