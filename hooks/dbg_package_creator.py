@@ -31,7 +31,7 @@ class Conan(ConanFile):
 
 
     def package_info(self):
-        self.env_info.SOURCE_MAP.append("%s|%s" % (self.name, os.path.join(self.package_folder, "src")))
+        self.env_info.SOURCE_MAP.append("{0}|%s" % self.name, os.path.join(self.package_folder, "src"))
         self.env_info.DEBUG_PATH.append(os.path.join(self.package_folder, "dbg"))
 """
 
@@ -81,7 +81,7 @@ def run(exe, args=None, env=None):
     if not args:
         args = []
     if not shutil.which(exe):
-        return ("", f"Command '{exe}' not found", 127)
+        return (bytes("", "utf8"), bytes(f"Command '{exe}' not found", "utf8"), 127)
     cmd = f"{exe} {' '.join(args)}"
     if env or env == {}:
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, env=env)
