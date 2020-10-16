@@ -31,7 +31,7 @@ class Conan(ConanFile):
 
 
     def package_info(self):
-        self.env_info.SOURCE_MAP.append("{0}|%s" % self.name, os.path.join(self.package_folder, "src"))
+        self.env_info.SOURCE_MAP.append("{0}|%s" % os.path.join(self.package_folder, "src"))
         self.env_info.DEBUG_PATH.append(os.path.join(self.package_folder, "dbg"))
 """
 
