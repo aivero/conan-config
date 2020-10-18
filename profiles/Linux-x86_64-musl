@@ -9,6 +9,7 @@ compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=musl
 libc_build=musl
+gstreamer=1.18
 [options]
 [build_requires]
 [env]
