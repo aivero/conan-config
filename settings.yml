@@ -11,6 +11,8 @@ arch_target: [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5hf, arm
 libc: [system, musl]
 libc_build: [system, musl]
 
+gstreamer: ["1.16", "1.17", "1.18"]
+
 # Rest of the settings are "host" settings:
 # - For native building/cross building: Where the library/program will run.
 # - For building cross compilation tools: Where the cross compiler will run.
