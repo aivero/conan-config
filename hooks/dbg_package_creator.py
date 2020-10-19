@@ -118,6 +118,9 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 # Check if file has debug_info
                 stdout, _, _ = run("file", [bin_file], {"PATH": os.environ["PATH"]})
                 if not b"debug_info" in stdout:
+                    # Some files without debug_info can still be stripped
+                    if b"not stripped" in stdout:
+                        run("strip", ["--strip-all", bin_file])
                     continue
                 # Extract debug info to debug file
                 run("objcopy", ["--only-keep-debug", bin_file, dbg_file])
