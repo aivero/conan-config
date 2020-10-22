@@ -12,6 +12,7 @@ libc: [system, musl]
 libc_build: [system, musl]
 
 gstreamer: ["1.16", "1.17", "1.18"]
+python: ["3.8"]
 
 # Rest of the settings are "host" settings:
 # - For native building/cross building: Where the library/program will run.
