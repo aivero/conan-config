@@ -10,6 +10,7 @@ build_type=RelWithDebInfo
 libc=system
 libc_build=system
 gstreamer=1.18
+python=3.8
 [options]
 [build_requires]
 [env]
