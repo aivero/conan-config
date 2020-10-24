@@ -18,6 +18,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 interpreter = "python"
             elif "perl" in shebang:
                 interpreter = "perl"
+            elif "bash" in shebang:
+                interpreter = "bash"
             elif "sh" in shebang:
                 interpreter = "sh"
             else:
