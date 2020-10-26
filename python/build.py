@@ -34,6 +34,8 @@ class Recipe(ConanFile):
         tools.patch(folder, patch)
 
     def build(self):
+        if not os.path.exists(f"{self.name}-{self.version}"):
+            return
         files = tuple(os.listdir(f"{self.name}-{self.version}"))
         if "meson.build" in files:
             self.meson()
