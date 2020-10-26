@@ -96,7 +96,7 @@ class Recipe(ConanFile):
             f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}.tgz"'
         )
 
-    def autotools(self, args=None, source_folder=None):
+    def autotools(self, args=None, source_folder=None, target=""):
         if args is None:
             args = []
         if "shared" in self.options:
@@ -122,7 +122,7 @@ class Recipe(ConanFile):
             else:
                 raise Exception("No configure or autogen.sh in source folder")
         autotools = AutoToolsBuildEnvironment(self)
-        autotools.configure(source_folder, args)
+        autotools.configure(source_folder, args, target=target)
         autotools.make()
         autotools.install()
 
