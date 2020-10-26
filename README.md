@@ -8,8 +8,8 @@ This repository contains all the shared conan configuration.
 ### Set platform profile
 - x86_64: `conan config set general.default_profile=linux_x86_64`
 - armv8: `conan config set general.default_profile=linux_armv8`
-- NVIDA TX2/Xavier: `conan config set general.default_profile=linux_armv8_l4t_t186_release`
-- NVIDA TX1/Nano: `conan config set general.default_profile=linux_armv8_l4t_t210_release`
+- NVIDIA TX2/Xavier: `conan config set general.default_profile=linux_armv8_l4t_t186_release`
+- NVIDIA TX1/Nano: `conan config set general.default_profile=linux_armv8_l4t_t210_release`
 
 
 ## Overview:
