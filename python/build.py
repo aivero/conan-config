@@ -3,6 +3,7 @@ import shutil
 from conans import *
 import conans.client.tools as tools
 
+
 class ConanTemplate(ConanFile):
     settings = "build_type", "compiler", "arch_build", "os_build", "libc_build"
 
@@ -78,6 +79,16 @@ class ConanTemplate(ConanFile):
     def autotools(self, args=None):
         if args is None:
             args = []
+        files = tuple(os.listdir(f"{self.name}-{self.version}"))
+        if "configure" not in files:
+            if "autogen.sh" in files:
+                env = {
+                    "NOCONFIGURE": "1",
+                }
+                with tools.environment_append(env):
+                    self.run("sh autogen.sh", cwd=f"{self.name}-{self.version}")
+            else:
+                raise Exception("No configure or autogen.sh in source folder")
         autotools = AutoToolsBuildEnvironment(self)
         autotools.configure(f"{self.name}-{self.version}", args)
         autotools.make()
@@ -86,7 +97,7 @@ class ConanTemplate(ConanFile):
     def make(self, args=None):
         if args is None:
             args = []
-        with tools.chdir(f"{self.name}-{self.version}")
+        with tools.chdir(f"{self.name}-{self.version}"):
             autotools = AutoToolsBuildEnvironment(self)
             autotools.make(args)
             autotools.install(args)
