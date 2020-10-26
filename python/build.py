@@ -9,6 +9,8 @@ import conans.client.tools as tools
 
 class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch_build", "os_build", "libc_build"
+    options = {"shared": [True, False]}
+    default_options = {"shared": True}
 
     def __init__(self, output, runner, display_name="", user=None, channel=None):
         super().__init__(output, runner, display_name, user, channel)
@@ -32,7 +34,7 @@ class Recipe(ConanFile):
         tools.patch(folder, patch)
 
     def build(self):
-        files = tuple(os.listdir("."))
+        files = tuple(os.listdir(f"{self.name}-{self.version}"))
         if "meson.build" in files:
             self.meson()
         elif "CMakeLists.txt" in files:
@@ -43,8 +45,10 @@ class Recipe(ConanFile):
             self.npm()
         elif "configure.ac" in files:
             self.autotools()
-        else:
+        elif "Makefile" in files:
             self.make()
+        else:
+            raise Exception("Cannot detect build system.")
 
     def package(self):
         pass
@@ -95,6 +99,12 @@ class Recipe(ConanFile):
     def autotools(self, args=None, source_folder=None):
         if args is None:
             args = []
+        if self.options.shared:
+            args.append("--enable-shared")
+            args.append("--disable-static")
+        else:
+            args.append("--enable-static")
+            args.append("--disable-shared")
         if source_folder is None:
             source_folder = f"{self.name}-{self.version}"
         files = tuple(os.listdir(f"{self.name}-{self.version}"))
@@ -118,6 +128,12 @@ class Recipe(ConanFile):
     def make(self, args=None, target=""):
         if args is None:
             args = []
+        if self.options.shared:
+            args.append("--enable-shared")
+            args.append("--disable-static")
+        else:
+            args.append("--enable-static")
+            args.append("--disable-shared")
         with tools.chdir(f"{self.name}-{self.version}"):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
