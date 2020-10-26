@@ -1,10 +1,13 @@
 import os
 import shutil
+import pathlib
+import glob
+import re
 from conans import *
 import conans.client.tools as tools
 
 
-class Recipe(ConanFile):
+class Recipe(RecipeFile):
     settings = "build_type", "compiler", "arch_build", "os_build", "libc_build"
 
     def __init__(self, output, runner, display_name="", user=None, channel=None):
@@ -36,6 +39,8 @@ class Recipe(ConanFile):
             self.cmake()
         elif "setup.py" in files:
             self.setuptools()
+        elif "package.json" in files:
+            self.npm()
         elif "configure.ac" in files:
             self.autotools()
         else:
@@ -71,33 +76,52 @@ class Recipe(ConanFile):
         cmake.install()
 
     def setuptools(self):
+        py_path = os.path.join(
+            self.package_folder, "lib", f"python{self.settings.python}", "site-packages"
+        )
+        os.makedirs(py_path)
+        os.environ["PYTHONPATH"] += py_path
+        os.environ["SETUPTOOLS_SCM_PRETEND_VERSION"] = self.version
         self.run(
             f'python setup.py install --optimize=1 --prefix= --root="{self.package_folder}"',
             cwd=f"{self.name}-{self.version}",
         )
 
-    def autotools(self, args=None):
+    def npm(self):
+        self.run(
+            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}.tgz"'
+        )
+
+    def autotools(self, args=None, source_folder=None):
         if args is None:
             args = []
+        if source_folder is None:
+            source_folder = f"{self.name}-{self.version}"
         files = tuple(os.listdir(f"{self.name}-{self.version}"))
         if "configure" not in files:
+            env = {
+                "NOCONFIGURE": "1",
+            }
             if "autogen.sh" in files:
-                env = {
-                    "NOCONFIGURE": "1",
-                }
                 with tools.environment_append(env):
-                    self.run("sh autogen.sh", cwd=f"{self.name}-{self.version}")
+                    self.run("sh autogen.sh", cwd=source_folder)
+            elif "configure.ac" in files:
+                with tools.environment_append(env):
+                    self.run("autoreconf -ifv", cwd=source_folder)
             else:
                 raise Exception("No configure or autogen.sh in source folder")
         autotools = AutoToolsBuildEnvironment(self)
-        autotools.configure(f"{self.name}-{self.version}", args)
+        autotools.configure(source_folder, args)
         autotools.make()
         autotools.install()
 
-    def make(self, args=None):
+    def make(self, args=None, target=""):
         if args is None:
             args = []
         with tools.chdir(f"{self.name}-{self.version}"):
             autotools = AutoToolsBuildEnvironment(self)
-            autotools.make(args)
-            autotools.install(args)
+            if target:
+                autotools.make(args, target=target)
+            else:
+                autotools.make(args)
+                autotools.install(args)
