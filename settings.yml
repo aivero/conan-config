@@ -14,8 +14,8 @@ libc_build: [system, musl]
 gstreamer: ["1.16", "1.18"]
 python: ["3.8"]
 hardware:
-    # NVIDIA Tegra devices - Linux for Tegra
     l4t:
+      # NVIDIA Tegra devices - Linux for Tegra
         version: ["32.2.1", "32.4.3"]
         # Xavier and TX2: t186
         # TX1 and Nano: t210
