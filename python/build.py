@@ -122,9 +122,12 @@ class Recipe(ConanFile):
             else:
                 raise Exception("No configure or autogen.sh in source folder")
         autotools = AutoToolsBuildEnvironment(self)
-        autotools.configure(source_folder, args, target=target)
-        autotools.make()
-        autotools.install()
+        autotools.configure(source_folder, args)
+        if target:
+            autotools.make(target=target)
+        else:
+            autotools.make()
+            autotools.install()
 
     def make(self, args=None, target=""):
         if args is None:
