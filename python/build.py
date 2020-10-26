@@ -99,12 +99,13 @@ class Recipe(ConanFile):
     def autotools(self, args=None, source_folder=None):
         if args is None:
             args = []
-        if self.options.shared:
-            args.append("--enable-shared")
-            args.append("--disable-static")
-        else:
-            args.append("--enable-static")
-            args.append("--disable-shared")
+        if "shared" in self.options:
+            if self.options.shared:
+                args.append("--enable-shared")
+                args.append("--disable-static")
+            else:
+                args.append("--enable-static")
+                args.append("--disable-shared")
         if source_folder is None:
             source_folder = f"{self.name}-{self.version}"
         files = tuple(os.listdir(f"{self.name}-{self.version}"))
@@ -128,12 +129,13 @@ class Recipe(ConanFile):
     def make(self, args=None, target=""):
         if args is None:
             args = []
-        if self.options.shared:
-            args.append("--enable-shared")
-            args.append("--disable-static")
-        else:
-            args.append("--enable-static")
-            args.append("--disable-shared")
+        if "shared" in self.options:
+            if self.options.shared:
+                args.append("--enable-shared")
+                args.append("--disable-static")
+            else:
+                args.append("--enable-static")
+                args.append("--disable-shared")
         with tools.chdir(f"{self.name}-{self.version}"):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
