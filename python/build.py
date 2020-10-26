@@ -7,7 +7,7 @@ from conans import *
 import conans.client.tools as tools
 
 
-class Recipe(RecipeFile):
+class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch_build", "os_build", "libc_build"
 
     def __init__(self, output, runner, display_name="", user=None, channel=None):
