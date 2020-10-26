@@ -3,11 +3,13 @@ This repository contains all the shared conan configuration.
 
 ## Install
 ### Install config
-`conan config install git@gitlab.com:aivero/public/conan/conan-config.git`
+`conan config install git@github.com:aivero/conan-config.git`
 
 ### Set platform profile
 - x86_64: `conan config set general.default_profile=linux_x86_64`
 - armv8: `conan config set general.default_profile=linux_armv8`
+- NVIDA TX2/Xavier: `conan config set general.default_profile=linux_armv8_l4t_t186_release`
+- NVIDA TX1/Nano: `conan config set general.default_profile=linux_armv8_l4t_t210_release`
 
 
 ## Overview:
