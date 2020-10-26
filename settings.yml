@@ -11,8 +11,16 @@ arch_target: [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5hf, arm
 libc: [system, musl]
 libc_build: [system, musl]
 
-gstreamer: ["1.16", "1.17", "1.18"]
+gstreamer: ["1.16", "1.18"]
 python: ["3.8"]
+hardware:
+    # NVIDIA Tegra devices - Linux for Tegra
+    l4t:
+        version: ["32.2.1", "32.4.3"]
+        # Xavier and TX2: t186
+        # TX1 and Nano: t210
+        board: ["t186", "t210"]
+    generic:
 
 # Rest of the settings are "host" settings:
 # - For native building/cross building: Where the library/program will run.
