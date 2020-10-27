@@ -8,8 +8,8 @@ arch_build:        [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5h
 os_target:         [Windows, Linux, Macos, Android, iOS, watchOS, tvOS, FreeBSD, SunOS, AIX, Arduino, Neutrino, Wasi]
 arch_target:       [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5hf, armv6, armv7, armv7hf, armv7s, armv7k, armv8, armv8_32, armv8.3, sparc, sparcv9, mips, mips64, avr, s390, s390x, asm.js, wasm, sh4le]
 
-libc:              [system, musl]
-libc_build:        [system, musl]
+libc:              [glibc, musl, bionic, wasi]
+libc_build:        [glibc, musl, bionic, wasi]
 
 gstreamer:         ["1.16", "1.18"]
 python:            ["3.8"]
