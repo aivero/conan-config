@@ -8,7 +8,7 @@ import conans.client.tools as tools
 
 
 class Recipe(ConanFile):
-    settings = "build_type", "compiler", "arch_build", "os_build", "libc_build"
+    settings = "build_type", "compiler", "arch", "os", "libc"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
 
