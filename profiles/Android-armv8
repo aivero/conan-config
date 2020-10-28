@@ -1,15 +1,11 @@
 [settings]
 os=Android
 os.api_level=28
-os_build=Linux
 arch=armv8
-arch_build=x86_64
 compiler=clang
 compiler.version=11
 compiler.libcxx=libc++
-build_type=RelWithDebInfo
 libc=bionic
-libc_build=glibc
 gstreamer=1.18
 python=3.8
 hardware=generic

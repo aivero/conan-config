@@ -1,14 +1,11 @@
 [settings]
 os=Linux
-os_build=Linux
 arch=armv8
-arch_build=armv8
 compiler=clang
 compiler.version=11
 compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=glibc
-libc_build=glibc
 gstreamer=1.18
 python=3.8
 hardware=generic
