@@ -26,11 +26,15 @@ class Recipe(ConanFile):
     def __init__(self, output, runner, display_name="", user=None, channel=None):
         super().__init__(output, runner, display_name, user, channel)
 
+    @property
+    def src(self):
+        return f"{self.name}-{self.version}"
+
     def exe(self, command, args=None, cwd=None):
         if not args:
             args = []
         if not cwd:
-            cwd = f"{self.name}-{self.version}"
+            cwd = self.src
         self.run(f"{command} {' '.join(args)}", cwd=cwd)
 
     def get(self, url, folder=None):
@@ -43,18 +47,18 @@ class Recipe(ConanFile):
             else:
                 folder = folders[0]
                 break
-        if folder != f"{self.name}-{self.version}":
-            shutil.move(folder, f"{self.name}-{self.version}")
+        if folder != self.src:
+            shutil.move(folder, self.src)
 
     def patch(self, patch, folder=None):
         if not folder:
-            folder = f"{self.name}-{self.version}"
+            folder = self.src
         tools.patch(folder, patch)
 
     def build(self):
-        if not os.path.exists(f"{self.name}-{self.version}"):
+        if not os.path.exists(self.src):
             return
-        files = tuple(os.listdir(f"{self.name}-{self.version}"))
+        files = tuple(os.listdir(self.src))
         if "meson.build" in files:
             self.meson()
         elif "CMakeLists.txt" in files:
@@ -73,7 +77,7 @@ class Recipe(ConanFile):
     def package(self):
         pass
 
-    def meson(self, args=None):
+    def meson(self, args=None, source_folder=None):
         base_args = [
             "--auto-features=disabled",
             "--wrap-mode=nofallback",
@@ -81,25 +85,31 @@ class Recipe(ConanFile):
         if args is None:
             args = []
         args += base_args
+        if source_folder is None:
+            source_folder = self.src
         meson = Meson(self)
         meson.configure(
             args,
-            source_folder=f"{self.name}-{self.version}",
+            source_folder=source_folder,
             pkg_config_paths=os.environ["PKG_CONFIG_PATH"].split(":"),
         )
         meson.install()
 
-    def cmake(self, definitions=None):
+    def cmake(self, definitions=None, source_folder=None):
         if definitions is None:
             definitions = {}
         cmake = CMake(self)
         for key, val in definitions.items():
             cmake.definitions[key] = val
-        cmake.configure(source_folder=f"{self.name}-{self.version}")
+        if source_folder is None:
+            source_folder = self.src
+        cmake.configure(source_folder=source_folder)
         cmake.build()
         cmake.install()
 
-    def setuptools(self):
+    def setuptools(self, source_folder=None):
+        if source_folder is None:
+            source_folder = self.src
         py_path = os.path.join(
             self.package_folder, "lib", f"python{self.settings.python}", "site-packages"
         )
@@ -108,7 +118,7 @@ class Recipe(ConanFile):
         os.environ["SETUPTOOLS_SCM_PRETEND_VERSION"] = self.version
         self.run(
             f'python setup.py install --optimize=1 --prefix= --root="{self.package_folder}"',
-            cwd=f"{self.name}-{self.version}",
+            cwd=source_folder,
         )
 
     def npm(self):
@@ -119,20 +129,15 @@ class Recipe(ConanFile):
     def autotools(self, args=None, source_folder=None, target=""):
         if args is None:
             args = []
-
         if source_folder is None:
-            source_folder = f"{self.name}-{self.version}"
-        files = tuple(os.listdir(f"{self.name}-{self.version}"))
+            source_folder = self.src
+        files = tuple(os.listdir(source_folder))
         if "configure" not in files:
-            env = {
-                "NOCONFIGURE": "1",
-            }
+            os.environ["NOCONFIGURE"] = "1"
             if "autogen.sh" in files:
-                with tools.environment_append(env):
-                    self.run("sh autogen.sh", cwd=source_folder)
+                self.run("sh autogen.sh", cwd=source_folder)
             elif "configure.ac" in files:
-                with tools.environment_append(env):
-                    self.run("autoreconf -ifv", cwd=source_folder)
+                self.run("autoreconf -ifv", cwd=source_folder)
             else:
                 raise Exception("No configure or autogen.sh in source folder")
         lib_type_works = file_contains(
@@ -146,18 +151,21 @@ class Recipe(ConanFile):
             else:
                 args.append("--enable-static")
                 args.append("--disable-shared")
-        autotools = AutoToolsBuildEnvironment(self)
-        autotools.configure(source_folder, args)
-        if target:
-            autotools.make(target=target)
-        else:
-            autotools.make()
-            autotools.install()
+        with tools.chdir(source_folder):
+            autotools = AutoToolsBuildEnvironment(self)
+            autotools.configure(args=args)
+            if target:
+                autotools.make(target=target)
+            else:
+                autotools.make()
+                autotools.install()
 
-    def make(self, args=None, target=""):
+    def make(self, args=None, source_folder=None, target=""):
         if args is None:
             args = []
-        with tools.chdir(f"{self.name}-{self.version}"):
+        if source_folder is None:
+            source_folder = self.src
+        with tools.chdir(source_folder):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
                 autotools.make(args, target=target)
