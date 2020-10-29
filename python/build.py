@@ -63,7 +63,7 @@ class Recipe(ConanFile):
             self.setuptools()
         elif "package.json" in files:
             self.npm()
-        elif "configure.ac" in files:
+        elif "configure.ac" in files or "configure" in files:
             self.autotools()
         elif "Makefile" in files:
             self.make()
