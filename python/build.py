@@ -8,7 +8,7 @@ import conans.client.tools as tools
 
 
 def file_contains(file, string):
-    with open(file) as f:
+    with open(file, "r", encoding="utf-8") as f:
         return string in f.read()
 
 
@@ -19,6 +19,11 @@ class Recipe(ConanFile):
 
     def __init__(self, output, runner, display_name="", user=None, channel=None):
         super().__init__(output, runner, display_name, user, channel)
+
+    def exe(self, command, cwd=None):
+        if not cwd:
+            cwd = f"{self.name}-{self.version}"
+        self.run(command, cwd=cwd)
 
     def get(self, url, folder=None):
         tools.get(url)
