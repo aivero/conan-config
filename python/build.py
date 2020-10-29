@@ -7,9 +7,15 @@ from conans import *
 import conans.client.tools as tools
 
 
-def file_contains(file, string):
+def file_contains(file, strings):
+    if strings is str:
+        strings = [strings]
     with open(file, "r", encoding="utf-8") as f:
-        return string in f.read()
+        content = f.read()
+        for string in strings:
+            if not string in content:
+                return False
+    return True
 
 
 class Recipe(ConanFile):
@@ -130,7 +136,8 @@ class Recipe(ConanFile):
             else:
                 raise Exception("No configure or autogen.sh in source folder")
         lib_type_works = file_contains(
-            os.path.join(source_folder, "configure"), "--enable-shared"
+            os.path.join(source_folder, "configure"),
+            ["--enable-shared", "--enable-static"],
         )
         if lib_type_works and "shared" in self.options:
             if self.options.shared:
