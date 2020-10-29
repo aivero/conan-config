@@ -175,7 +175,7 @@ class Recipe(ConanFile):
                 autotools.make(args)
                 autotools.install(args)
 
-    def cargo(self, args=None):
+    def cargo(self, args=None, source_folder=None):
         if args is None:
             args = []
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
