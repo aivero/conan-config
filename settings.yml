@@ -6,7 +6,7 @@ arch_target:       [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5h
 
 gstreamer:         ["1.16", "1.18"]
 python:            ["3.8"]
-rust:              ["1.47.0"]
+rust:              ["1.47"]
 hardware:
   l4t:
     # NVIDIA Tegra devices - Linux for Tegra
