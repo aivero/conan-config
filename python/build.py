@@ -20,10 +20,12 @@ class Recipe(ConanFile):
     def __init__(self, output, runner, display_name="", user=None, channel=None):
         super().__init__(output, runner, display_name, user, channel)
 
-    def exe(self, command, cwd=None):
+    def exe(self, command, args=None, cwd=None):
+        if not args:
+            args = []
         if not cwd:
             cwd = f"{self.name}-{self.version}"
-        self.run(command, cwd=cwd)
+        self.run(f"{command} {' '.join(args)}", cwd=cwd)
 
     def get(self, url, folder=None):
         tools.get(url)
