@@ -71,6 +71,8 @@ class Recipe(ConanFile):
             self.autotools()
         elif "Makefile" in files:
             self.make()
+        elif "Cargo.toml" in files:
+            self.cargo()
         else:
             raise Exception("Cannot detect build system.")
 
@@ -172,3 +174,12 @@ class Recipe(ConanFile):
             else:
                 autotools.make(args)
                 autotools.install(args)
+
+    def cargo(self, args=None):
+        if args is None:
+            args = []
+        if self.settings.build_type in ("Release", "RelWithDebInfo"):
+            args.append("--release")
+        if source_folder is None:
+            source_folder = self.src
+        self.exe("cargo build", args)
