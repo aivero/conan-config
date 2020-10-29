@@ -7,6 +7,11 @@ from conans import *
 import conans.client.tools as tools
 
 
+def file_contains(file, string):
+    with open(file) as f:
+        return string in f.read()
+
+
 class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch", "os", "libc"
     options = {"shared": [True, False]}
@@ -101,13 +106,7 @@ class Recipe(ConanFile):
     def autotools(self, args=None, source_folder=None, target=""):
         if args is None:
             args = []
-        if "shared" in self.options:
-            if self.options.shared:
-                args.append("--enable-shared")
-                args.append("--disable-static")
-            else:
-                args.append("--enable-static")
-                args.append("--disable-shared")
+
         if source_folder is None:
             source_folder = f"{self.name}-{self.version}"
         files = tuple(os.listdir(f"{self.name}-{self.version}"))
@@ -123,6 +122,16 @@ class Recipe(ConanFile):
                     self.run("autoreconf -ifv", cwd=source_folder)
             else:
                 raise Exception("No configure or autogen.sh in source folder")
+        lib_type_works = file_contains(
+            os.path.join(source_folder, "configure"), "--enable-shared"
+        )
+        if lib_type_works and "shared" in self.options:
+            if self.options.shared:
+                args.append("--enable-shared")
+                args.append("--disable-static")
+            else:
+                args.append("--enable-static")
+                args.append("--disable-shared")
         autotools = AutoToolsBuildEnvironment(self)
         autotools.configure(source_folder, args)
         if target:
@@ -134,13 +143,6 @@ class Recipe(ConanFile):
     def make(self, args=None, target=""):
         if args is None:
             args = []
-        if "shared" in self.options:
-            if self.options.shared:
-                args.append("--enable-shared")
-                args.append("--disable-static")
-            else:
-                args.append("--enable-static")
-                args.append("--disable-shared")
         with tools.chdir(f"{self.name}-{self.version}"):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
