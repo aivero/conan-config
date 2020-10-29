@@ -7,6 +7,9 @@ compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=wasi
 gstreamer=1.18
+python=3.8
+rust=1.47.0
+hardware=generic
 [options]
 [build_requires]
 [env]

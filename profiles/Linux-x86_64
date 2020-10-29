@@ -7,8 +7,9 @@ compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=glibc
 gstreamer=1.18
-hardware=generic
+rust=1.47.0
 python=3.8
+hardware=generic
 [options]
 [build_requires]
 [env]
