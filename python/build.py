@@ -3,8 +3,27 @@ import shutil
 import pathlib
 import glob
 import re
+import json
+import subprocess
 from conans import *
 import conans.client.tools as tools
+
+
+def call(cmd, args, show=True):
+    child = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE)
+    fulloutput = b""
+    while True:
+        output = child.stdout.readline()
+        if output == b"" and child.poll() is not None:
+            break
+        if output:
+            if show:
+                print(output.decode("utf-8"), end="")
+            fulloutput += output
+    fulloutput = fulloutput.decode("utf-8")
+    if child.poll() != 0:
+        raise RuntimeError(fulloutput)
+    return fulloutput
 
 
 def file_contains(file, strings):
@@ -79,16 +98,49 @@ class Recipe(ConanFile):
     def package(self):
         pass
 
-    def meson(self, args=None, source_folder=None):
-        base_args = [
+    def meson(self, opts=None, source_folder=None):
+        args = [
             "--auto-features=disabled",
             "--wrap-mode=nofallback",
         ]
-        if args is None:
-            args = []
-        args += base_args
+        if opts is None:
+            opts = {}
         if source_folder is None:
             source_folder = self.src
+
+        meson_file = os.path.join(source_folder, "meson.build")
+        if not os.path.exists(meson_file):
+            raise Exception(f"meson.build not found: {meson_file}")
+        opts_data = json.loads(
+            call("meson", ["introspect", "--buildoptions", meson_file])
+        )
+        for (opt_name, opt_val) in opts.items():
+            opt_data = next(
+                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
+                None,
+            )
+            if not opt_data:
+                raise Exception(f"Unrecognized Meson option: {opt_name}")
+            # Value checking
+            if opt_data["type"] == "combo":
+                if "enabled" in opt_data["choices"] and opt_val is True:
+                    opt_val = "enabled"
+                elif "disabled" in opt_data["choices"] and opt_val is False:
+                    opt_val = "disabled"
+                else:
+                    opt_val = str(opt_val)
+                    if opt_val not in opt_data["choices"]:
+                        raise Exception(f"Invalid {opt_name} value: {opt_val}")
+            if opt_data["type"] == "boolean":
+                if opt_val not in (True, False):
+                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
+                opt_val = str(opt_val)
+            if opt_data["type"] == "array":
+                if not opt_val is list:
+                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
+                opt_val = str(opt_val)
+            args.append(f"-D{opt_name}={opt_val}")
+
         meson = Meson(self)
         meson.configure(
             args,
