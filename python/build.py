@@ -192,3 +192,6 @@ class RustRecipe(Recipe):
 class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
 
+
+class GstreamerRecipe(Recipe):
+    settings = Recipe.settings + ("gstreamer",)
