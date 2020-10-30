@@ -9,7 +9,7 @@ from conans import *
 import conans.client.tools as tools
 
 
-def call(cmd, args, show=True):
+def call(cmd, args, show=False):
     child = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE)
     fulloutput = b""
     while True:
