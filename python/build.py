@@ -124,13 +124,18 @@ class Recipe(ConanFile):
             # Value checking
             opt_val = str(opt_val)
             if opt_data["type"] == "combo":
-                if "enabled" in opt_data["choices"] and opt_val == "True":
-                    opt_val = "enabled"
-                elif "disabled" in opt_data["choices"] and opt_val == "False":
-                    opt_val = "disabled"
-                else:
-                    if opt_val not in opt_data["choices"]:
-                        raise Exception(f"Invalid {opt_name} value: {opt_val}")
+                if opt_val == "True":
+                    if "enabled" in opt_data["choices"]:
+                        opt_val = "enabled"
+                    elif "true" in opt_data["choices"]:
+                        opt_val = "true"
+                elif opt_val == "False":
+                    if "disabled" in opt_data["choices"]:
+                        opt_val = "disabled"
+                    elif "false" in opt_data["choices"]:
+                        opt_val = "false"
+                if opt_val not in opt_data["choices"]:
+                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
             if opt_data["type"] == "boolean":
                 if opt_val not in ("True", "False"):
                     raise Exception(f"Invalid {opt_name} value: {opt_val}")
