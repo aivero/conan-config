@@ -18,14 +18,6 @@ def file_contains(file, strings):
     return True
 
 
-class RustRecipe(Recipe):
-    settings = Recipe.settings + ("rust",)
-
-
-class PythonRecipe(Recipe):
-    settings = Recipe.settings + ("python",)
-
-
 class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch", "os", "libc"
     options = {"shared": [True, False]}
@@ -191,3 +183,12 @@ class Recipe(ConanFile):
         if source_folder is None:
             source_folder = self.src
         self.exe("cargo build", args)
+
+
+class RustRecipe(Recipe):
+    settings = Recipe.settings + ("rust",)
+
+
+class PythonRecipe(Recipe):
+    settings = Recipe.settings + ("python",)
+
