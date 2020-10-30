@@ -122,23 +122,18 @@ class Recipe(ConanFile):
             if not opt_data:
                 raise Exception(f"Unrecognized Meson option: {opt_name}")
             # Value checking
+            opt_val = str(opt_val)
             if opt_data["type"] == "combo":
-                if "enabled" in opt_data["choices"] and opt_val is True:
+                if "enabled" in opt_data["choices"] and opt_val == "True":
                     opt_val = "enabled"
-                elif "disabled" in opt_data["choices"] and opt_val is False:
+                elif "disabled" in opt_data["choices"] and opt_val == "False":
                     opt_val = "disabled"
                 else:
-                    opt_val = str(opt_val)
                     if opt_val not in opt_data["choices"]:
                         raise Exception(f"Invalid {opt_name} value: {opt_val}")
             if opt_data["type"] == "boolean":
-                if opt_val not in (True, False):
+                if opt_val not in ("True", "False"):
                     raise Exception(f"Invalid {opt_name} value: {opt_val}")
-                opt_val = str(opt_val)
-            if opt_data["type"] == "array":
-                if not opt_val is list:
-                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
-                opt_val = str(opt_val)
             args.append(f"-D{opt_name}={opt_val}")
 
         meson = Meson(self)
