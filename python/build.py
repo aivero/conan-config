@@ -60,12 +60,12 @@ class Recipe(ConanFile):
             cwd = self.src
         self.run(f"{command} {' '.join(args)}", cwd=cwd)
 
-    def get(self, url, dest_folder=None):
+    def get(self, url, dest_folder=None, src_folder):
         if not dest_folder:
             dest_folder = self.src
         tools.get(url)
         for _, folders, _ in os.walk("."):
-            if len(folders) > 1 and not folder:
+            if len(folders) > 1 and not src_folder:
                 raise Exception(
                     "Cannot determine which folder to rename. Please set folder argument."
                 )
