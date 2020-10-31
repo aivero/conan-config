@@ -63,8 +63,9 @@ class Recipe(ConanFile):
     def get(self, url, dest_folder=None, src_folder=None):
         if not dest_folder:
             dest_folder = self.src
-        tools.get(url)
-        for _, folders, _ in os.walk("."):
+        tmp_folder = "get_tmp_folder"
+        tools.get(url, destination=tmp_folder)
+        for _, folders, _ in os.walk(tmp_folder):
             if len(folders) > 1 and not src_folder:
                 raise Exception(
                     "Cannot determine which folder to rename. Please set folder argument."
@@ -73,7 +74,8 @@ class Recipe(ConanFile):
                 folder = folders[0]
                 break
         if folder != dest_folder:
-            shutil.move(folder, dest_folder)
+            shutil.move(os.path.join(tmp_folder, folder), dest_folder)
+        shutil.rmtree(tmp_folder)
 
     def patch(self, patch, folder=None):
         if not folder:
@@ -155,17 +157,23 @@ class Recipe(ConanFile):
         )
         meson.install()
 
-    def cmake(self, definitions=None, source_folder=None):
-        if definitions is None:
-            definitions = {}
+    def cmake(self, defs=None, targets=None, source_folder=None, build_folder=None):
+        if defs is None:
+            defs = {}
+        if targets is str:
+            targets = [targets]
         cmake = CMake(self)
-        for key, val in definitions.items():
+        for key, val in defs.items():
             cmake.definitions[key] = val
         if source_folder is None:
             source_folder = self.src
-        cmake.configure(source_folder=source_folder)
-        cmake.build()
-        cmake.install()
+        cmake.configure(source_folder=source_folder, build_folder=build_folder)
+        if targets:
+            for target in targets:
+                cmake.build(target=target)
+        else:
+            cmake.build()
+            cmake.install()
 
     def setuptools(self, source_folder=None):
         if source_folder is None:
