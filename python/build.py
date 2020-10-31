@@ -73,8 +73,7 @@ class Recipe(ConanFile):
             else:
                 folder = folders[0]
                 break
-        if folder != dest_folder:
-            shutil.move(os.path.join(tmp_folder, folder), dest_folder)
+        shutil.move(os.path.join(tmp_folder, folder), dest_folder)
         shutil.rmtree(tmp_folder)
 
     def patch(self, patch, folder=None):
