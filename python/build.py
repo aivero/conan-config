@@ -156,7 +156,14 @@ class Recipe(ConanFile):
         )
         meson.install()
 
-    def cmake(self, defs=None, targets=None, source_folder=None, build_folder=None):
+    def cmake(
+        self,
+        defs=None,
+        targets=None,
+        source_folder=None,
+        build_folder=None,
+        install=True,
+    ):
         if defs is None:
             defs = {}
         if targets is str:
@@ -172,7 +179,8 @@ class Recipe(ConanFile):
                 cmake.build(target=target)
         else:
             cmake.build()
-            cmake.install()
+            if install:
+                cmake.install()
 
     def setuptools(self, source_folder=None):
         if source_folder is None:
