@@ -60,7 +60,9 @@ class Recipe(ConanFile):
             cwd = self.src
         self.run(f"{command} {' '.join(args)}", cwd=cwd)
 
-    def get(self, url, folder=None):
+    def get(self, url, dest_folder=None):
+        if not dest_folder:
+            dest_folder = self.src
         tools.get(url)
         for _, folders, _ in os.walk("."):
             if len(folders) > 1 and not folder:
@@ -70,8 +72,8 @@ class Recipe(ConanFile):
             else:
                 folder = folders[0]
                 break
-        if folder != self.src:
-            shutil.move(folder, self.src)
+        if folder != dest_folder:
+            shutil.move(folder, dest_folder)
 
     def patch(self, patch, folder=None):
         if not folder:
