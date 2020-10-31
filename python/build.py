@@ -26,6 +26,10 @@ def call(cmd, args, show=False):
     return fulloutput
 
 
+def env_replace(env_var, string, replace=""):
+    os.environ[env_var] = os.environ[env_var].replace(string, replace)
+
+
 def file_contains(file, strings):
     if strings is str:
         strings = [strings]
