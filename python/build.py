@@ -4,6 +4,7 @@ import pathlib
 import glob
 import re
 import json
+import yaml
 import subprocess
 from conans import *
 import conans.client.tools as tools
@@ -48,6 +49,16 @@ class Recipe(ConanFile):
 
     def __init__(self, output, runner, display_name="", user=None, channel=None):
         super().__init__(output, runner, display_name, user, channel)
+
+    def set_name(self):
+        self.name = self.name or os.path.basename(os.path.dirname(os.getcwd()))
+
+    def set_version(self):
+        if os.path.exists("../config.yml"):
+            with open("../config.yml", "r") as conf_file:
+                conf = yaml.safe_load(conf_file)
+
+        self.version = self.version or conf[0]["version"]
 
     @property
     def src(self):
