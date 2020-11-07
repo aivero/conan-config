@@ -238,14 +238,13 @@ class Recipe(ConanFile):
             else:
                 args.append("--enable-static")
                 args.append("--disable-shared")
-        with tools.chdir(source_folder):
-            autotools = AutoToolsBuildEnvironment(self)
-            autotools.configure(args=args)
-            if target:
-                autotools.make(target=target)
-            else:
-                autotools.make()
-                autotools.install()
+        autotools = AutoToolsBuildEnvironment(self)
+        autotools.configure(source_folder, args)
+        if target:
+            autotools.make(target=target)
+        else:
+            autotools.make()
+            autotools.install()
 
     def make(self, args=None, source_folder=None, target=""):
         if args is None:
