@@ -240,11 +240,16 @@ class Recipe(ConanFile):
                 args.append("--disable-shared")
         autotools = AutoToolsBuildEnvironment(self)
         autotools.configure(source_folder, args)
-        if target:
-            autotools.make(target=target)
+        if os.path.exists("Makefile"):
+            build_folder = ""
         else:
-            autotools.make()
-            autotools.install()
+            build_folder = source_folder
+        with tools.chdir(build_folder):
+            if target:
+                autotools.make(target=target)
+            else:
+                autotools.make()
+                autotools.install()
 
     def make(self, args=None, source_folder=None, target=""):
         if args is None:
