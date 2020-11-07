@@ -54,11 +54,12 @@ class Recipe(ConanFile):
         self.name = self.name or os.path.basename(os.path.dirname(os.getcwd()))
 
     def set_version(self):
+        conf = None
         if os.path.exists("../config.yml"):
             with open("../config.yml", "r") as conf_file:
-                conf = yaml.safe_load(conf_file)
+                conf = yaml.safe_load(conf_file)[0]["version"]
 
-        self.version = self.version or conf[0]["version"]
+        self.version = self.version or conf
 
     @property
     def src(self):
