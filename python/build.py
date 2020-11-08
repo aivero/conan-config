@@ -241,7 +241,7 @@ class Recipe(ConanFile):
         autotools = AutoToolsBuildEnvironment(self)
         autotools.configure(source_folder, args)
         if os.path.exists("Makefile"):
-            build_folder = ""
+            build_folder = "."
         else:
             build_folder = source_folder
         with tools.chdir(build_folder):
