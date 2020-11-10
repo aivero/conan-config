@@ -210,7 +210,7 @@ class Recipe(ConanFile):
 
     def npm(self):
         self.run(
-            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}.tgz"'
+            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
         )
 
     def autotools(self, args=None, source_folder=None, target=""):
@@ -251,11 +251,13 @@ class Recipe(ConanFile):
                 autotools.make()
                 autotools.install()
 
-    def make(self, args=None, source_folder=None, target=""):
+    def make(self, args=None, source_folder=None, target="", env=None):
         if args is None:
             args = []
         if source_folder is None:
             source_folder = self.src
+        if env is None:
+            env = {}
         with tools.chdir(source_folder):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
