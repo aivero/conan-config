@@ -1,3 +1,3 @@
-aivero-all https://aivero.jfrog.io/artifactory/aivero-all/ True
-aivero-internal https://aivero.jfrog.io/artifactory/aivero_internal True
-aivero-public https://aivero.jfrog.io/artifactory/aivero_public True
+aivero-all https://aivero.jfrog.io/artifactory/api/conan/aivero-all True
+aivero-internal https://aivero.jfrog.io/artifactory/api/conan/aivero_internal True
+aivero-public https://aivero.jfrog.io/artifactory/api/conan/aivero_public True
