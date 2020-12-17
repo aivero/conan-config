@@ -286,3 +286,25 @@ class PythonRecipe(Recipe):
 
 class GstreamerRecipe(Recipe):
     settings = Recipe.settings + ("gstreamer",)
+
+
+class Project(Recipe):
+    @property
+    def src(self):
+        return "."
+
+class RustProject(Project):
+    settings = Recipe.settings + ("rust",)
+    exports_sources = [
+        "Cargo.toml",
+        "src/*"
+    ]
+
+    def package(self):
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
+        manifest = json.loads(manifest_raw)
+        for target in manifest["targets"]:
+            if target["kind"] == "dylib":
+                self.copy(pattern=f"target/release/{target['name']}.so", dst="lib", keep_path=False)
+            if target["kind"] == "bin":
+                self.copy(pattern=f"target/release/{target['name']}", dst="bin", keep_path=False)
