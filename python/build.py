@@ -220,7 +220,10 @@ class Recipe(ConanFile):
             source_folder = self.src
         files = tuple(os.listdir(source_folder))
         if "configure" not in files:
+            # Don't run configure twice
             os.environ["NOCONFIGURE"] = "1"
+            # Ignore running as root (For CICD)
+            os.environ["FORCE_UNSAFE_CONFIGURE"] = "1" 
             if "autogen.sh" in files:
                 self.run("sh autogen.sh", cwd=source_folder)
             elif "configure.ac" in files:
