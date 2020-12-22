@@ -56,8 +56,8 @@ class Recipe(ConanFile):
 
     def set_version(self):
         conf = None
-        if os.path.exists("../config.yml"):
-            with open("../config.yml", "r") as conf_file:
+        if os.path.exists("devops.yml"):
+            with open("devops.yml", "r") as conf_file:
                 conf = yaml.safe_load(conf_file)[0]["version"]
 
         self.version = self.version or conf
@@ -301,6 +301,7 @@ class RustProject(Project):
     settings = Recipe.settings + ("rust",)
     exports_sources = [
         "Cargo.toml",
+        "build.rs",
         "src/*"
     ]
 
