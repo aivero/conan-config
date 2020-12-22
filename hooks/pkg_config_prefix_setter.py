@@ -8,7 +8,7 @@ def replace_prefix_in_pc_file(pc_file, prefix):
         for l in f:
             if l == "prefix=\n":
                 f.seek(0)
-                return f.read().replace("prefix=", "prefix={}".format(prefix))
+                return f.read().replace("prefix=", f"prefix={prefix}")
             if "prefix=" in l:
                 old_prefix = l.split("=")[1][:-1]
                 break
@@ -22,7 +22,7 @@ def replace_prefix_in_pc_file(pc_file, prefix):
                     old_prefix = l.split("=")[1][:-9]
                     break
         if not old_prefix:
-            raise Exception("Could not find package prefix in '%s'" % pc_file)
+            raise Exception(f"Could not find package prefix in '{pc_file}'")
         f.seek(0)
         return f.read().replace(old_prefix, prefix)
 

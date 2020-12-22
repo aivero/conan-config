@@ -24,7 +24,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 interpreter = "sh"
             else:
                 continue
-            lines.insert(0, "#!/usr/bin/env %s\n" % interpreter)
+            lines.insert(0, f"#!/usr/bin/env {interpreter}\n")
             with open(exe_path, mode="w") as exe:
                 exe.writelines(lines)
         except UnicodeDecodeError:
