@@ -48,19 +48,17 @@ class Recipe(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": True}
 
-    def __init__(self, output, runner, display_name="", user=None, channel=None):
-        super().__init__(output, runner, display_name, user, channel)
-
     def set_name(self):
-        self.name = self.name or os.path.basename(os.path.dirname(os.getcwd()))
+        self.name = self.name or os.path.basename(self.recipe_folder)
 
     def set_version(self):
-        conf = None
-        if os.path.exists("devops.yml"):
-            with open("devops.yml", "r") as conf_file:
-                conf = yaml.safe_load(conf_file)[0]["version"]
+        version = None
+        conf_path = os.path.join(self.recipe_folder, "devops.yml")
+        if os.path.exists(conf_path):
+            with open(conf_path, "r") as conf_file:
+                version = yaml.safe_load(conf_file)[0]["version"]
 
-        self.version = self.version or conf
+        self.version = self.version or version
 
     @property
     def src(self):
