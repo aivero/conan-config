@@ -5,6 +5,7 @@ import glob
 import re
 import json
 import yaml
+import toml
 import subprocess
 from conans import *
 import conans.client.tools as tools
@@ -302,6 +303,21 @@ class RustProject(Project):
         "Cargo.toml",
         "src/*"
     ]
+
+    def build(self):
+        # Overwrite version
+        version = str(self.version)
+        if version == "master":
+            version = "0.0.0-master"
+        cargo = toml.load("Cargo.toml")
+        cargo["package"]["version"] = version
+        with open('Cargo.toml', 'w') as f:
+            toml.dump(cargo, f)
+
+        args = []
+        if self.settings.build_type in ("Release", "RelWithDebInfo"):
+            args.append("--release")
+        self.exe("cargo build", args)
 
     def package(self):
         manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
