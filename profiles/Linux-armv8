@@ -8,7 +8,7 @@ build_type=RelWithDebInfo
 libc=glibc
 gstreamer=1.18
 python=3.8
-rust=1.47
+rust=1.48
 hardware=generic
 [options]
 [build_requires]
