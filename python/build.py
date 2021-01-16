@@ -339,10 +339,17 @@ class RustProject(Project):
         self.exe("cargo build", args)
 
     def package(self):
+        output_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo", "release")
         manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
         manifest = json.loads(manifest_raw)
         for target in manifest["targets"]:
-            if target["kind"] == "dylib":
-                self.copy(pattern=f"target/release/{target['name']}.so", dst="lib", keep_path=False)
-            if target["kind"] == "bin":
-                self.copy(pattern=f"target/release/{target['name']}", dst="bin", keep_path=False)
+            if "cdylib" in target["kind"]:
+                name = f"lib{target['name']}.so"
+                dst = "lib"
+            elif "bin" in target["kind"]:
+                name = f"{target['name']}"
+                dst = "bin"
+            else:
+                continue
+            os.makedirs(os.path.join(self.package_folder, dst))
+            shutil.copy(os.path.join(output_folder, name), os.path.join(self.package_folder, dst, name))
