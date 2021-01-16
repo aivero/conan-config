@@ -49,7 +49,7 @@ class Recipe(ConanFile):
     default_options = {"shared": True}
 
     def set_name(self):
-        self.name = self.name or os.path.basename(self.recipe_folder)
+        os.environ["CONAN_HOME_FOLDER"] = call("conan", ["config", "home"])[:-1]
 
     def set_version(self):
         version = None
@@ -318,7 +318,12 @@ class RustProject(Project):
         with open('Cargo.toml', 'w') as f:
             toml.dump(cargo, f)
 
-        args = []
+        cache_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo")
+        if not os.path.exists(cache_folder):
+            os.makedirs(cache_folder)
+        args = [
+            f"--target-dir {cache_folder}",
+        ]
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
             args.append("--release")
         self.exe("cargo build", args)
