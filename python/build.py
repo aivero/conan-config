@@ -49,14 +49,24 @@ class Recipe(ConanFile):
     default_options = {"shared": True}
 
     def set_name(self):
+        if not self.name:
+            conf_path = os.path.join(self.recipe_folder, "devops.yml")
+            if os.path.exists(conf_path):
+                with open(conf_path, "r") as conf_file:
+                    conf = yaml.safe_load(conf_file)
+                    if "name" in conf[0]:
+                        self.name = conf[0]["name"]
+            if not self.name:
+                self.name = os.path.basename(self.recipe_folder)
+        os.environ["ORIGIN_FOLDER"] = self.recipe_folder
         os.environ["CONAN_HOME_FOLDER"] = call("conan", ["config", "home"])[:-1]
 
     def set_version(self):
         version = None
         conf_path = os.path.join(self.recipe_folder, "devops.yml")
         if os.path.exists(conf_path):
-            with open(conf_path, "r") as conf_file:
-                version = yaml.safe_load(conf_file)[0]["version"]
+            with open(conf_path, "r") as conf:
+                version = yaml.safe_load(conf)[0]["version"]
 
         self.version = self.version or version
 
@@ -240,7 +250,7 @@ class Recipe(ConanFile):
                 args.append("--disable-shared")
         autotools = AutoToolsBuildEnvironment(self)
         # Ignore running as root (For CICD)
-        os.environ["FORCE_UNSAFE_CONFIGURE"] = "1" 
+        os.environ["FORCE_UNSAFE_CONFIGURE"] = "1"
         autotools.configure(source_folder, args)
         if os.path.exists("Makefile"):
             build_folder = "."
