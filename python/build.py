@@ -72,7 +72,7 @@ class Recipe(ConanFile):
 
     @property
     def src(self):
-        return f"{self.name}-{self.version}"
+        return f"{self.name}-{self.version}.src"
 
     def exe(self, command, args=None, cwd=None):
         if not args:
