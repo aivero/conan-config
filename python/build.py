@@ -281,6 +281,10 @@ class Recipe(ConanFile):
     def cargo(self, args=None, source_folder=None):
         if args is None:
             args = []
+        cache_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo")
+        if not os.path.exists(cache_folder):
+            os.makedirs(cache_folder)
+        args.append(f"--target-dir {cache_folder}")
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
             args.append("--release")
         if source_folder is None:
@@ -309,34 +313,14 @@ class RustProject(Project):
     settings = Recipe.settings + ("rust",)
     exports_sources = [
         "Cargo.toml",
+        "src/*",
         "build.rs",
-        "src/*"
+        "examples/*",
+        "benches/*",
     ]
 
     def build(self):
-        # Overwrite version
-        version = str(self.version)
-        if version == "master":
-            version = "0.0.0-master"
-        cargo = toml.load("Cargo.toml")
-        if "dependencies" in cargo:
-            for name, dep in cargo["dependencies"].items():
-                if "path" in dep and ".." in dep["path"]:
-                    dep["path"] = dep["path"].replace("..", os.path.dirname(os.environ["ORIGIN_FOLDER"]))
-
-        cargo["package"]["version"] = version
-        with open('Cargo.toml', 'w') as f:
-            toml.dump(cargo, f)
-
-        cache_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo")
-        if not os.path.exists(cache_folder):
-            os.makedirs(cache_folder)
-        args = [
-            f"--target-dir {cache_folder}",
-        ]
-        if self.settings.build_type in ("Release", "RelWithDebInfo"):
-            args.append("--release")
-        self.exe("cargo build", args)
+        self.cargo()
 
     def package(self):
         output_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo", "release")
