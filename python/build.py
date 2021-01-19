@@ -295,6 +295,28 @@ class Recipe(ConanFile):
 class RustRecipe(Recipe):
     settings = Recipe.settings + ("rust",)
 
+    def package(self):
+        output_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo", "release")
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
+        manifest = json.loads(manifest_raw)
+        for target in manifest["targets"]:
+            if "cdylib" in target["kind"]:
+                target = f"lib{target['name']}.so"
+                dest_folder = "lib"
+            elif "bin" in target["kind"]:
+                target = f"{target['name']}"
+                dest_folder = "bin"
+            else:
+                continue
+
+            target_path = os.path.join(output_folder, target)
+            dest_path = os.path.join(self.package_folder, dest_folder)
+
+            if not os.path.exists(dest_path):
+                os.makedirs(dest_path)
+            if os.path.exists(target_path):
+                shutil.copy(target_path, os.path.join(dest_path, target))
+
 
 class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
@@ -309,7 +331,7 @@ class Project(Recipe):
     def src(self):
         return "."
 
-class RustProject(Project):
+class RustProject(Project, RustRecipe):
     settings = Recipe.settings + ("rust",)
     exports_sources = [
         "Cargo.toml",
@@ -321,19 +343,3 @@ class RustProject(Project):
 
     def build(self):
         self.cargo()
-
-    def package(self):
-        output_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo", "release")
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
-        manifest = json.loads(manifest_raw)
-        for target in manifest["targets"]:
-            if "cdylib" in target["kind"]:
-                name = f"lib{target['name']}.so"
-                dst = "lib"
-            elif "bin" in target["kind"]:
-                name = f"{target['name']}"
-                dst = "bin"
-            else:
-                continue
-            os.makedirs(os.path.join(self.package_folder, dst))
-            shutil.copy(os.path.join(output_folder, name), os.path.join(self.package_folder, dst, name))
