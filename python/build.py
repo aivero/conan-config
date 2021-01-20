@@ -287,7 +287,7 @@ class Recipe(ConanFile):
     def cargo(self, args=None, source_folder=None):
         if args is None:
             args = []
-        cache_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo")
+        cache_folder = os.path.join(self.conan_home, "cache", "cargo")
         if not os.path.exists(cache_folder):
             os.makedirs(cache_folder)
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
