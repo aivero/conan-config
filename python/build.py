@@ -48,6 +48,13 @@ class Recipe(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": True}
 
+    @property
+    def conan_home(self):
+        if hasattr(self, "_conan_home"):
+            return self._conan_home
+        self._conan_home = call("conan", ["config", "home"])[:-1]
+        return self._conan_home
+
     def set_name(self):
         if not self.name:
             conf_path = os.path.join(self.recipe_folder, "devops.yml")
@@ -59,7 +66,6 @@ class Recipe(ConanFile):
             if not self.name:
                 self.name = os.path.basename(self.recipe_folder)
         os.environ["ORIGIN_FOLDER"] = self.recipe_folder
-        os.environ["CONAN_HOME_FOLDER"] = call("conan", ["config", "home"])[:-1]
 
     def set_version(self):
         version = None
@@ -284,7 +290,6 @@ class Recipe(ConanFile):
         cache_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo")
         if not os.path.exists(cache_folder):
             os.makedirs(cache_folder)
-        args.append(f"--target-dir {cache_folder}")
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
             args.append("--release")
         if source_folder is None:
@@ -296,8 +301,11 @@ class RustRecipe(Recipe):
     settings = Recipe.settings + ("rust",)
 
     def package(self):
-        output_folder = os.path.join(os.environ["CONAN_HOME_FOLDER"], "cache", "cargo", "release")
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", os.path.join(self.src, "Cargo.toml")])
+        target_folder = os.path.join(self.conan_home, "cache", "cargo")
+        cargo_toml = os.path.join(self.src, "Cargo.toml")
+        if not os.path.exists(cargo_toml):
+            return
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         for target in manifest["targets"]:
             if "cdylib" in target["kind"]:
@@ -309,7 +317,7 @@ class RustRecipe(Recipe):
             else:
                 continue
 
-            target_path = os.path.join(output_folder, target)
+            target_path = os.path.join(target_folder, target)
             dest_path = os.path.join(self.package_folder, dest_folder)
 
             if not os.path.exists(dest_path):
@@ -322,7 +330,7 @@ class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
 
 
-class GstreamerRecipe(Recipe):
+class GstRecipe(Recipe):
     settings = Recipe.settings + ("gstreamer",)
 
 
@@ -332,7 +340,6 @@ class Project(Recipe):
         return "."
 
 class RustProject(Project, RustRecipe):
-    settings = Recipe.settings + ("rust",)
     exports_sources = [
         "Cargo.toml",
         "src/*",
@@ -343,3 +350,6 @@ class RustProject(Project, RustRecipe):
 
     def build(self):
         self.cargo()
+
+class GstRustProject(RustProject):
+    settings = RustProject.settings + ("gstreamer",)
