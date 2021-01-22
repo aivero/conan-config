@@ -56,25 +56,38 @@ class Recipe(ConanFile):
         return self._conan_home
 
     def set_name(self):
-        if not self.name:
-            conf_path = os.path.join(self.recipe_folder, "devops.yml")
-            if os.path.exists(conf_path):
-                with open(conf_path, "r") as conf_file:
-                    conf = yaml.safe_load(conf_file)
-                    if "name" in conf[0]:
-                        self.name = conf[0]["name"]
-            if not self.name:
-                self.name = os.path.basename(self.recipe_folder)
         os.environ["ORIGIN_FOLDER"] = self.recipe_folder
-
-    def set_version(self):
-        version = None
+        # Get name from argument
+        if self.name:
+            return
+        # Get name from devops.yml
         conf_path = os.path.join(self.recipe_folder, "devops.yml")
         if os.path.exists(conf_path):
-            with open(conf_path, "r") as conf:
-                version = yaml.safe_load(conf)[0]["version"]
+            with open(conf_path, "r") as conf_file:
+                conf = yaml.safe_load(conf_file)
+                if conf[0] and "name" in conf[0]:
+                    self.name = conf[0]["name"]
+                    return
+        # Get name from folder
+        self.name = os.path.basename(self.recipe_folder)
 
-        self.version = self.version or version
+    def set_version(self):
+        # Get version from argument
+        if self.version:
+            return
+        # Get version from devops.yml
+        conf_path = os.path.join(self.recipe_folder, "devops.yml")
+        if os.path.exists(conf_path):
+            with open(conf_path, "r") as conf_file:
+                conf = yaml.safe_load(conf_file)
+                if conf[0] and "version" in conf[0]:
+                    self.version = conf["version"]
+                    return
+        # Get version from GITHUB_REF env var
+        if "GITHUB_REF" in os.environ:
+            self.version = os.environ["GITHUB_REF"].split("/")[2]
+        # Get version from git
+        self.version = call("git", ["branch", "--show-current"])
 
     @property
     def src(self):
