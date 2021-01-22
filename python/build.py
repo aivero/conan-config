@@ -335,6 +335,7 @@ class GstRecipe(Recipe):
 
 
 class Project(Recipe):
+    settings = Recipe.settings + ("release",)
     @property
     def src(self):
         return "."
