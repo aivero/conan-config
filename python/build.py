@@ -81,7 +81,7 @@ class Recipe(ConanFile):
             with open(conf_path, "r") as conf_file:
                 conf = yaml.safe_load(conf_file)
                 if conf[0] and "version" in conf[0]:
-                    self.version = conf["version"]
+                    self.version = conf[0]["version"]
                     return
         # Get version from GITHUB_REF env var
         if "GITHUB_REF" in os.environ:
