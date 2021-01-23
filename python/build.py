@@ -42,6 +42,15 @@ def file_contains(file, strings):
                 return False
     return True
 
+_branch = None
+def branch():
+    global _branch
+    if _branch:
+        return _branch
+    _branch = call("git", ["branch", "--show-current"])
+    if _branch == '':
+        _branch = "detached-head"
+    return _branch
 
 class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch", "os", "libc"
@@ -87,7 +96,7 @@ class Recipe(ConanFile):
         if "GITHUB_REF" in os.environ:
             self.version = os.environ["GITHUB_REF"].split("/")[2]
         # Get version from git
-        self.version = call("git", ["branch", "--show-current"])
+        self.version = branch()
 
     @property
     def src(self):
@@ -348,7 +357,6 @@ class GstRecipe(Recipe):
 
 
 class Project(Recipe):
-    settings = Recipe.settings + ("release",)
     @property
     def src(self):
         return "."
