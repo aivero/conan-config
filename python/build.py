@@ -185,11 +185,15 @@ class Recipe(ConanFile):
                         opt_val = "enabled"
                     elif "true" in opt_data["choices"]:
                         opt_val = "true"
+                    elif "yes" in opt_data["choices"]:
+                        opt_val = "yes"
                 elif opt_val == "False":
                     if "disabled" in opt_data["choices"]:
                         opt_val = "disabled"
                     elif "false" in opt_data["choices"]:
                         opt_val = "false"
+                    elif "no" in opt_data["choices"]:
+                        opt_val = "no"
                 if opt_val not in opt_data["choices"]:
                     raise Exception(f"Invalid {opt_name} value: {opt_val}")
             if opt_data["type"] == "boolean":
