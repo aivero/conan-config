@@ -361,6 +361,9 @@ class Project(Recipe):
     def src(self):
         return "."
 
+class GstProject(Project, GstRecipe):
+    pass
+
 class RustProject(Project, RustRecipe):
     exports_sources = [
         "Cargo.toml",
@@ -373,5 +376,5 @@ class RustProject(Project, RustRecipe):
     def build(self):
         self.cargo()
 
-class GstRustProject(RustProject):
-    settings = RustProject.settings + ("gstreamer",)
+class GstRustProject(GstProject, RustProject):
+    pass
