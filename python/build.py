@@ -10,6 +10,9 @@ import subprocess
 from conans import *
 import conans.client.tools as tools
 
+METADATA_FILE = "metadata.yml"
+DEVOPS_FILE = "devops.yml"
+
 
 def call(cmd, args, show=False):
     child = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE)
@@ -42,27 +45,73 @@ def file_contains(file, strings):
                 return False
     return True
 
+
+def read_metadata(key):
+    metadata = {}
+    if os.path.exists(METADATA_FILE):
+        with open(METADATA_FILE) as metadata_file:
+            return yaml.load(metadata_file)[key]
+
+
+_commit = None
+
+
+def commit():
+    global _commit
+    if _commit:
+        return _commit
+    if "GITHUB_SHA" in os.environ:
+        _commit = os.environ["GITHUB_SHA"]
+        return _commit
+    if os.path.exists(METADATA_FILE):
+        with open(METADATA_FILE) as metadata_file:
+            _commit = yaml.load(metadata_file)["commit"]
+            return _commit
+    _commit = call("git", ["rev-parse", "HEAD"])[:-1]
+    return _commit
+
+
 _branch = None
+
+
 def branch():
     global _branch
     if _branch:
         return _branch
-    _branch = call("git", ["branch", "--show-current"])
+    if "GITHUB_REF" in os.environ:
+        _branch = os.environ["GITHUB_REF"].split("/")[2]
+        return _branch
+    if os.path.exists(METADATA_FILE):
+        with open(METADATA_FILE) as metadata_file:
+            _branch = yaml.load(metadata_file)["branch"]
+            return _branch
+    _branch = call("git", ["branch", "--show-current"])[:-1]
     if _branch == '':
         _branch = "detached-head"
     return _branch
+
 
 class Recipe(ConanFile):
     settings = "build_type", "compiler", "arch", "os", "libc"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
+    _conan_home = None
+    _conan_storage = None
 
     @property
     def conan_home(self):
-        if hasattr(self, "_conan_home"):
+        if self._conan_home:
             return self._conan_home
         self._conan_home = call("conan", ["config", "home"])[:-1]
         return self._conan_home
+
+    @property
+    def conan_storage(self):
+        if self._conan_storage:
+            return self._conan_storage
+        self._conan_storage = call(
+            "conan", ["config", "get", "storage.path"])[:-1]
+        return self._conan_storage
 
     def set_name(self):
         os.environ["ORIGIN_FOLDER"] = self.recipe_folder
@@ -70,7 +119,7 @@ class Recipe(ConanFile):
         if self.name:
             return
         # Get name from devops.yml
-        conf_path = os.path.join(self.recipe_folder, "devops.yml")
+        conf_path = os.path.join(self.recipe_folder, DEVOPS_FILE)
         if os.path.exists(conf_path):
             with open(conf_path, "r") as conf_file:
                 conf = yaml.safe_load(conf_file)
@@ -85,18 +134,15 @@ class Recipe(ConanFile):
         if self.version:
             return
         # Get version from devops.yml
-        conf_path = os.path.join(self.recipe_folder, "devops.yml")
+        conf_path = os.path.join(self.recipe_folder, DEVOPS_FILE)
         if os.path.exists(conf_path):
             with open(conf_path, "r") as conf_file:
                 conf = yaml.safe_load(conf_file)
                 if conf[0] and "version" in conf[0]:
                     self.version = conf[0]["version"]
                     return
-        # Get version from GITHUB_REF env var
-        if "GITHUB_REF" in os.environ:
-            self.version = os.environ["GITHUB_REF"].split("/")[2]
         # Get version from git
-        self.version = branch()
+        self.version = commit()
 
     @property
     def src(self):
@@ -172,7 +218,8 @@ class Recipe(ConanFile):
         )
         for (opt_name, opt_val) in opts.items():
             opt_data = next(
-                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
+                (opt_data for opt_data in opts_data if opt_name ==
+                 opt_data["name"]),
                 None,
             )
             if not opt_data:
@@ -331,7 +378,8 @@ class RustRecipe(Recipe):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call(
+            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         for target in manifest["targets"]:
             if "cdylib" in target["kind"]:
@@ -365,8 +413,10 @@ class Project(Recipe):
     def src(self):
         return "."
 
+
 class GstProject(Project, GstRecipe):
     pass
+
 
 class RustProject(Project, RustRecipe):
     exports_sources = [
@@ -379,6 +429,7 @@ class RustProject(Project, RustRecipe):
 
     def build(self):
         self.cargo()
+
 
 class GstRustProject(GstProject, RustProject):
     pass
