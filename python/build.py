@@ -7,6 +7,7 @@ import json
 import yaml
 import toml
 import subprocess
+import sys
 from conans import *
 import conans.client.tools as tools
 
@@ -102,7 +103,7 @@ class Recipe(ConanFile):
     def conan_home(self):
         if self._conan_home:
             return self._conan_home
-        self._conan_home = call("conan", ["config", "home"])[:-1]
+        self._conan_home = call(sys.argv[0], ["config", "home"])[:-1]
         return self._conan_home
 
     @property
@@ -110,7 +111,7 @@ class Recipe(ConanFile):
         if self._conan_storage:
             return self._conan_storage
         self._conan_storage = call(
-            "conan", ["config", "get", "storage.path"])[:-1]
+            sys.argv[0], ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
