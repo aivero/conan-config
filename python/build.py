@@ -440,4 +440,32 @@ class RustProject(Project, RustRecipe):
 
 
 class GstRustProject(GstProject, RustProject):
-    pass
+    def package(self):
+        target_folder = os.path.join(self.conan_home, "cache", "cargo")
+        cargo_toml = os.path.join(self.src, "Cargo.toml")
+        if not os.path.exists(cargo_toml):
+            return
+        manifest_raw = call(
+            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest = json.loads(manifest_raw)
+        # (Copy gstreamer elements to lib/streamer-1.0)
+        for target in manifest["targets"]:
+            if "cdylib" in target["kind"]:
+                target = f"lib{target['name']}.so"
+                dest_folder = os.path.join("lib", "gstreamer-1.0")
+            elif "bin" in target["kind"]:
+                target = f"{target['name']}"
+                dest_folder = "bin"
+            else:
+                continue
+
+            if self.settings.build_type in ("Release", "RelWithDebInfo"):
+                build_dir = "release"
+            else:
+                build_dir = "debug"
+            target_path = os.path.join(target_folder, build_dir, target)
+            dest_path = os.path.join(self.package_folder, dest_folder)
+            if not os.path.exists(dest_path):
+                os.makedirs(dest_path)
+            if os.path.exists(target_path):
+                shutil.copy(target_path, os.path.join(dest_path, target))
