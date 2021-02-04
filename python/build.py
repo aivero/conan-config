@@ -384,7 +384,7 @@ class RustRecipe(Recipe):
         manifest = json.loads(manifest_raw)
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
-            if "cdylib" in target["kind"]:
+            if "cdylib" in target["kind"] or "dylib" in target["kind"]:
                 target = f"lib{target['name']}.so"
                 dest_folder = "lib"
             elif "bin" in target["kind"]:
