@@ -453,6 +453,9 @@ class GstRustProject(GstProject, RustProject):
             if "cdylib" in target["kind"]:
                 target = f"lib{target['name']}.so"
                 dest_folder = os.path.join("lib", "gstreamer-1.0")
+            elif "dylib" in target["kind"]:
+                target = f"lib{target['name']}.so"
+                dest_folder = "lib"
             elif "bin" in target["kind"]:
                 target = f"{target['name']}"
                 dest_folder = "bin"
