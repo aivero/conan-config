@@ -381,12 +381,12 @@ class RustRecipe(Recipe):
         manifest = json.loads(manifest_raw)
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
-            name = target["name"].replace("-", "_")
             if "cdylib" in target["kind"] or "dylib" in target["kind"]:
+                name = target["name"].replace("-", "_")
                 target = f"lib{name}.so"
                 dest_folder = "lib"
             elif "bin" in target["kind"]:
-                target = name
+                target = target["name"]
                 dest_folder = "bin"
             else:
                 continue
@@ -447,15 +447,16 @@ class GstRustProject(GstProject, RustProject):
         manifest = json.loads(manifest_raw)
         # (Copy gstreamer elements to lib/streamer-1.0)
         for target in manifest["targets"]:
-            name = target["name"].replace("-", "_")
             if "cdylib" in target["kind"]:
+                name = target["name"].replace("-", "_")
                 target = f"lib{name}.so"
                 dest_folder = os.path.join("lib", "gstreamer-1.0")
             elif "dylib" in target["kind"]:
+                name = target["name"].replace("-", "_")
                 target = f"lib{name}.so"
                 dest_folder = "lib"
             elif "bin" in target["kind"]:
-                target = name
+                target = target["name"]
                 dest_folder = "bin"
             else:
                 continue
