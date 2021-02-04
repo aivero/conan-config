@@ -39,13 +39,18 @@ def pre_package_info(output, conanfile, reference, **kwargs):
                 os.path.join(python_lib_path, "site-packages")
             )
 
-    gir_path = os.path.join(conanfile.cpp_info.rootpath, "lib", "girepository-1.0")
+    gir_path = os.path.join(conanfile.cpp_info.rootpath,
+                            "lib", "girepository-1.0")
     if os.path.isdir(gir_path):
         conanfile.env_info.GI_TYPELIB_PATH.append(os.path.join(gir_path))
 
     share_path = os.path.join(conanfile.cpp_info.rootpath, "share")
     if os.path.isdir(share_path):
         conanfile.env_info.XDG_DATA_DIRS.append(share_path)
+
+    gst_plugin_path = os.path.join(conanfile.cpp_info.rootpath, "lib", "")
+    if os.path.isdir(gst_plugin_path):
+        conanfile.env_info.GST_PLUGIN_PATH.append(gst_plugin_path)
 
     aclocal_path = os.path.join(conanfile.package_folder, "share", "aclocal")
     if os.path.isdir(aclocal_path):
