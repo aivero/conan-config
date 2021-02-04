@@ -110,8 +110,7 @@ class Recipe(ConanFile):
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        self._conan_storage = call(
-            sys.argv[0], ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
@@ -219,8 +218,7 @@ class Recipe(ConanFile):
         )
         for (opt_name, opt_val) in opts.items():
             opt_data = next(
-                (opt_data for opt_data in opts_data if opt_name ==
-                 opt_data["name"]),
+                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
                 None,
             )
             if not opt_data:
@@ -379,16 +377,16 @@ class RustRecipe(Recipe):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call(
-            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
+            name = target["name"].replace("-", "_")
             if "cdylib" in target["kind"] or "dylib" in target["kind"]:
-                target = f"lib{target['name']}.so"
+                target = f"lib{name}.so"
                 dest_folder = "lib"
             elif "bin" in target["kind"]:
-                target = f"{target['name']}"
+                target = name
                 dest_folder = "bin"
             else:
                 continue
@@ -445,19 +443,19 @@ class GstRustProject(GstProject, RustProject):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call(
-            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # (Copy gstreamer elements to lib/streamer-1.0)
         for target in manifest["targets"]:
+            name = target["name"].replace("-", "_")
             if "cdylib" in target["kind"]:
-                target = f"lib{target['name']}.so"
+                target = f"lib{name}.so"
                 dest_folder = os.path.join("lib", "gstreamer-1.0")
             elif "dylib" in target["kind"]:
-                target = f"lib{target['name']}.so"
+                target = f"lib{name}.so"
                 dest_folder = "lib"
             elif "bin" in target["kind"]:
-                target = f"{target['name']}"
+                target = name
                 dest_folder = "bin"
             else:
                 continue
