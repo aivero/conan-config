@@ -87,7 +87,7 @@ def branch():
             _branch = yaml.load(metadata_file)["branch"]
             return _branch
     _branch = call("git", ["branch", "--show-current"])[:-1]
-    if _branch == '':
+    if _branch == "":
         _branch = "detached-head"
     return _branch
 
@@ -110,8 +110,7 @@ class Recipe(ConanFile):
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        self._conan_storage = call(
-            sys.argv[0], ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
@@ -219,8 +218,7 @@ class Recipe(ConanFile):
         )
         for (opt_name, opt_val) in opts.items():
             opt_data = next(
-                (opt_data for opt_data in opts_data if opt_name ==
-                 opt_data["name"]),
+                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
                 None,
             )
             if not opt_data:
@@ -379,9 +377,9 @@ class RustRecipe(Recipe):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call(
-            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
+        # Automatically cdylibs and bins
         for target in manifest["targets"]:
             if "cdylib" in target["kind"]:
                 target = f"lib{target['name']}.so"
@@ -392,9 +390,12 @@ class RustRecipe(Recipe):
             else:
                 continue
 
-            target_path = os.path.join(target_folder, target)
+            if self.settings.build_type in ("Release", "RelWithDebInfo"):
+                build_dir = "release"
+            else:
+                build_dir = "debug"
+            target_path = os.path.join(target_folder, build_dir, target)
             dest_path = os.path.join(self.package_folder, dest_folder)
-
             if not os.path.exists(dest_path):
                 os.makedirs(dest_path)
             if os.path.exists(target_path):
