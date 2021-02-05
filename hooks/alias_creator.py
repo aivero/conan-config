@@ -14,6 +14,7 @@ def pre_export(output, conanfile, conanfile_path, **kwargs):
     assert conanfile
     # Create branch alias for sha commit versions
     if re.match("^[0-9a-f]{40}$", conanfile.version):
+        output.info(f"Creating alias '{conanfile.name}/{branch()}' to '{conanfile.name}/{conanfile.version}'")
         os.system(f"conan alias {conanfile.name}/{branch()} {conanfile.name}/{conanfile.version}")
 
 def post_export(output, conanfile, conanfile_path, **kwargs):
