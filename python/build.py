@@ -80,7 +80,7 @@ def branch():
     if _branch:
         return _branch
     if "GIT_REF" in os.environ:
-        _branch = os.environ["GIT_REF"].split("/")[2]
+        _branch = os.environ["GIT_REF"]
         return _branch
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
