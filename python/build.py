@@ -302,9 +302,11 @@ class Recipe(ConanFile):
             f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
         )
 
-    def autotools(self, args=None, source_folder=None, target=""):
+    def autotools(self, args=None, source_folder=None, target="", make_args=None):
         if args is None:
             args = []
+        if make_args is None:
+            make_args = []
         if source_folder is None:
             source_folder = self.src
         files = tuple(os.listdir(source_folder))
@@ -338,10 +340,10 @@ class Recipe(ConanFile):
             build_folder = source_folder
         with tools.chdir(build_folder):
             if target:
-                autotools.make(target=target)
+                autotools.make(make_args, target=target)
             else:
-                autotools.make()
-                autotools.install()
+                autotools.make(make_args)
+                autotools.install(make_args)
 
     def make(self, args=None, source_folder=None, target="", env=None):
         if args is None:
