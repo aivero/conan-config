@@ -86,7 +86,7 @@ def branch():
         with open(METADATA_FILE) as metadata_file:
             _branch = yaml.load(metadata_file)["branch"]
             return _branch
-    _branch = call("git", ["branch", "--show-current"])[:-1]
+    _branch = call("git", ["rev-parse", "--abbrev-ref", "HEAD"])[:-1]
     if _branch == "":
         _branch = "detached-head"
     return _branch
