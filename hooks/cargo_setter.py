@@ -18,5 +18,6 @@ def pre_build(output, conanfile, **kwargs):
                     "..", os.path.dirname(os.environ["ORIGIN_FOLDER"]))
 
     cargo["package"]["version"] = version
+    cargo["workspace"] = {}
     with open('Cargo.toml', 'w') as f:
         toml.dump(cargo, f)
