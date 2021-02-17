@@ -438,6 +438,10 @@ class RustProject(Project, RustRecipe):
         "benches/*",
     ]
 
+    @property
+    def src(self):
+        return self.name
+
     def build(self):
         self.cargo()
 
