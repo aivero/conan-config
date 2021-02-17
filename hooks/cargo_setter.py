@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import semver
 import toml
@@ -45,16 +46,17 @@ def post_source(output, conanfile, **kwargs):
         shutil.move(pfile, src)
 
     # Load cargo project file
-    cargo_path = os.path.join(src, "Cargo.toml")
-    cargo = toml.load(cargo_path)
 
-    # Set version
-    version = str(conanfile.version)
-    if not semver.parse(version, loose=True):
-        version = f"0.0.0-{version}"
-    cargo["package"]["version"] = version
-    with open(cargo_path, 'w') as f:
-        toml.dump(cargo, f)
+    # Set version if it is not a git commit sha
+    if not re.match("^[0-9a-f]{40}$", conanfile.version):
+        cargo_path = os.path.join(src, "Cargo.toml")
+        cargo = toml.load(cargo_path)
+        version = str(conanfile.version)
+        if not semver.parse(version, loose=True):
+            version = f"0.0.0-{version}"
+        cargo["package"]["version"] = version
+        with open(cargo_path, 'w') as f:
+            toml.dump(cargo, f)
 
 
 def pre_build(output, conanfile, **kwargs):
