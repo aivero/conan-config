@@ -1,9 +1,18 @@
 import os
 import shutil
-from distutils.dir_util import copy_tree
 import semver
 import toml
 from build import RustProject
+
+
+def copytree(src_dir, dst_dir):
+    for item in os.listdir(src_dir):
+        src = os.path.join(src_dir, item)
+        dst = os.path.join(dst_dir, item)
+        if os.path.isdir(src):
+            copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
 
 
 def copy_dependency(project_path, origin):
@@ -16,7 +25,7 @@ def copy_dependency(project_path, origin):
                 src = os.path.realpath(os.path.join(
                     origin, dep["path"]))
                 dst = os.path.realpath(os.path.join(project_path, dep["path"]))
-                copy_tree(src, dst)
+                copytree(src, dst)
                 deps += copy_dependency(dst, src)
     return deps
 
@@ -60,7 +69,7 @@ def pre_build(output, conanfile, **kwargs):
         dep, conanfile.source_folder), deps))
 
     # Create workspace
-    workspace_path = os.path.join("Cargo.toml")
+    workspace_path = "Cargo.toml"
     workspace = {
         "workspace": {
             "members": deps
