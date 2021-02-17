@@ -6,6 +6,8 @@ from build import RustProject
 
 
 def copytree(src_dir, dst_dir):
+    if not os.path.exists(dst_dir):
+        os.mkdir(dst_dir)
     for item in os.listdir(src_dir):
         src = os.path.join(src_dir, item)
         dst = os.path.join(dst_dir, item)
