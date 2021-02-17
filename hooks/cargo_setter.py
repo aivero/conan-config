@@ -1,5 +1,6 @@
 import os
 import shutil
+from distutils.dir_util import copy_tree
 import semver
 import toml
 from build import RustProject
@@ -15,7 +16,7 @@ def copy_dependency(project_path, origin):
                 src = os.path.realpath(os.path.join(
                     origin, dep["path"]))
                 dst = os.path.realpath(os.path.join(project_path, dep["path"]))
-                shutil.copytree(src, dst, dirs_exist_ok=True)
+                copy_tree(src, dst)
                 deps += copy_dependency(dst, src)
     return deps
 
