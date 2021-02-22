@@ -12,6 +12,7 @@ rust=1.49
 hardware=l4t
 hardware.version=32.4.3
 hardware.board=t186
+deployment=False
 [options]
 [build_requires]
 [env]
