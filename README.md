@@ -3,7 +3,7 @@ This repository contains all the shared conan configuration.
 
 ## Install
 ### Install config
-`conan config install git@github.com:aivero/conan-config.git`
+`conan config install https://github.com/aivero/conan-config.git`
 
 ### Set platform profile
 - x86_64: `conan config set general.default_profile=linux_x86_64`
