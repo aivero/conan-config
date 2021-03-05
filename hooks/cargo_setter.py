@@ -54,7 +54,7 @@ def post_source(output, conanfile, **kwargs):
         version = str(conanfile.version)
         if not semver.parse(version, loose=True):
             version = f"0.0.0-{version}"
-        cargo["package"]["version"] = version
+        cargo["package"]["version"] = version.replace("_", "-")
         with open(cargo_path, 'w') as f:
             toml.dump(cargo, f)
 
