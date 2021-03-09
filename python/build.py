@@ -360,17 +360,21 @@ class Recipe(ConanFile):
                 autotools.make(args)
                 autotools.install(args)
 
-    def cargo(self, args=None, source_folder=None):
+    def cargo(self, args=None, source_folder=None, clean=None):
         if args is None:
             args = []
         cache_folder = os.path.join(self.conan_home, "cache", "cargo")
         if not os.path.exists(cache_folder):
             os.makedirs(cache_folder)
+        if clean:
+            for pkg in clean:
+                self.exe(f"cargo clean -p", [pkg])
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
             args.append("--release")
         if source_folder is None:
             source_folder = self.src
         self.exe("cargo build", args)
+        
 
 
 class RustRecipe(Recipe):
