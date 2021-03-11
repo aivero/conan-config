@@ -16,6 +16,12 @@ hardware:
       # Xavier and TX2: t186
       # TX1 and Nano: t210
       board:       ["t186", "t210"]
+  rpi:
+    # Raspberry devices
+      # Raspbian os version, if installed 
+      version:     ["10"]
+      # RPi4: pi4
+      board:       ["pi4"]
   generic: ~
 
 build_type:        [None, Debug, Release, RelWithDebInfo, MinSizeRel]
