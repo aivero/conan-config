@@ -17,7 +17,8 @@ hardware:
       # TX1 and Nano: t210
       board:       ["t186", "t210"]
   rpi:
-    # NVIDIA Tegra devices - Linux for Tegra
+    # Raspberry devices
+      # Raspbian os version, if installed 
       version:     ["10"]
       # RPi4: pi4
       board:       ["pi4"]
