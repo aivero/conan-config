@@ -1,6 +1,6 @@
 [settings]
 os=Linux
-arch=armv8
+arch=armv8_32
 compiler=clang
 compiler.version=11
 compiler.libcxx=libc++
