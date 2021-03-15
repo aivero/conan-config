@@ -110,8 +110,7 @@ class Recipe(ConanFile):
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        self._conan_storage = call(
-            sys.argv[0], ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
@@ -177,6 +176,12 @@ class Recipe(ConanFile):
             folder = self.src
         tools.patch(folder, patch)
 
+    def rmdir(self, dir_name):
+        shutil.rmtree(dir_name)
+
+    def extract(self, archive):
+        tools.untargz(os.path.join(self.src, archive))
+
     def build(self):
         if not os.path.exists(self.src):
             return
@@ -219,8 +224,7 @@ class Recipe(ConanFile):
         )
         for (opt_name, opt_val) in opts.items():
             opt_data = next(
-                (opt_data for opt_data in opts_data if opt_name ==
-                 opt_data["name"]),
+                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
                 None,
             )
             if not opt_data:
@@ -302,48 +306,53 @@ class Recipe(ConanFile):
             f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
         )
 
-    def autotools(self, args=None, source_folder=None, target="", make_args=None):
+    def autotools(
+        self, args=None, source_folder=None, target="", make_args=None, env=None
+    ):
         if args is None:
             args = []
         if make_args is None:
             make_args = []
         if source_folder is None:
             source_folder = self.src
-        files = tuple(os.listdir(source_folder))
-        if "configure" not in files:
-            # Don't run configure twice
-            os.environ["NOCONFIGURE"] = "1"
-            if "autogen.sh" in files:
-                self.run("sh autogen.sh", cwd=source_folder)
-            elif "configure.ac" in files:
-                self.run("autoreconf -ifv", cwd=source_folder)
+        if env is None:
+            env = {}
+        with tools.environment_append(env):
+            files = tuple(os.listdir(source_folder))
+            if "configure" not in files:
+                # Don't run configure twice
+                os.environ["NOCONFIGURE"] = "1"
+                if "autogen.sh" in files:
+                    self.run("sh autogen.sh", cwd=source_folder)
+                elif "configure.ac" in files:
+                    self.run("autoreconf -ifv", cwd=source_folder)
+                else:
+                    raise Exception("No configure or autogen.sh in source folder")
+            lib_type_works = file_contains(
+                os.path.join(source_folder, "configure"),
+                ["--enable-shared", "--enable-static"],
+            )
+            if lib_type_works and "shared" in self.options:
+                if self.options.shared:
+                    args.append("--enable-shared")
+                    args.append("--disable-static")
+                else:
+                    args.append("--enable-static")
+                    args.append("--disable-shared")
+            autotools = AutoToolsBuildEnvironment(self)
+            # Ignore running as root (For CICD)
+            os.environ["FORCE_UNSAFE_CONFIGURE"] = "1"
+            autotools.configure(source_folder, args)
+            if os.path.exists("Makefile"):
+                build_folder = "."
             else:
-                raise Exception("No configure or autogen.sh in source folder")
-        lib_type_works = file_contains(
-            os.path.join(source_folder, "configure"),
-            ["--enable-shared", "--enable-static"],
-        )
-        if lib_type_works and "shared" in self.options:
-            if self.options.shared:
-                args.append("--enable-shared")
-                args.append("--disable-static")
-            else:
-                args.append("--enable-static")
-                args.append("--disable-shared")
-        autotools = AutoToolsBuildEnvironment(self)
-        # Ignore running as root (For CICD)
-        os.environ["FORCE_UNSAFE_CONFIGURE"] = "1"
-        autotools.configure(source_folder, args)
-        if os.path.exists("Makefile"):
-            build_folder = "."
-        else:
-            build_folder = source_folder
-        with tools.chdir(build_folder):
-            if target:
-                autotools.make(make_args, target=target)
-            else:
-                autotools.make(make_args)
-                autotools.install(make_args)
+                build_folder = source_folder
+            with tools.chdir(build_folder):
+                if target:
+                    autotools.make(make_args, target=target)
+                else:
+                    autotools.make(make_args)
+                    autotools.install(make_args)
 
     def make(self, args=None, source_folder=None, target="", env=None):
         if args is None:
@@ -352,7 +361,7 @@ class Recipe(ConanFile):
             source_folder = self.src
         if env is None:
             env = {}
-        with tools.chdir(source_folder):
+        with tools.chdir(source_folder), tools.environment_append(env):
             autotools = AutoToolsBuildEnvironment(self)
             if target:
                 autotools.make(args, target=target)
@@ -385,8 +394,7 @@ class RustRecipe(Recipe):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call(
-            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
@@ -456,8 +464,7 @@ class GstRustProject(GstProject, RustProject):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call(
-            "cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # (Copy gstreamer elements to lib/streamer-1.0)
         for target in manifest["targets"]:
