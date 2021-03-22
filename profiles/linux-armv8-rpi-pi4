@@ -10,6 +10,7 @@ gstreamer=1.18
 python=3.8
 rust=1.49
 hardware=rpi
+hardware.version=20
 hardware.board=pi4
 deployment=False
 [options]

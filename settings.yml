@@ -19,7 +19,7 @@ hardware:
   rpi:
     # Raspberry devices
       # Raspbian os version, if installed 
-      version:     ["10"]
+      version:     ["10", "20"]
       # RPi4: pi4
       board:       ["pi4"]
   generic: ~
