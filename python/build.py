@@ -103,22 +103,14 @@ class Recipe(ConanFile):
     def conan_home(self):
         if self._conan_home:
             return self._conan_home
-        if os.path.isabs(sys.argv[0]):
-            conan_path = sys.argv[0]
-        else:
-            conan_path = os.path.abspath(sys.argv[0])
-        self._conan_home = call(conan_path, ["config", "home"])[:-1]
+        self._conan_home = call(sys.argv[0], ["config", "home"])[:-1]
         return self._conan_home
 
     @property
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        if os.path.isabs(sys.argv[0]):
-            conan_path = sys.argv[0]
-        else:
-            conan_path = os.path.abspath(sys.argv[0])
-        self._conan_storage = call(conan_path, ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
