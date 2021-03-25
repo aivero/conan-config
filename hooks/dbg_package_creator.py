@@ -4,11 +4,9 @@ import shutil
 import subprocess
 
 TEMPLATE = """
-import os
-import shutil
-from conans import *
+from build import *
 
-class Conan(ConanFile):
+class Debug(ConanFile):
     name = "{0}-dbg"
     version = "{1}"
     license = {2}
@@ -16,7 +14,6 @@ class Conan(ConanFile):
     settings = {3}
     build_requires = "{0}/{1}"
 
-    # Avoid warning about missing build method
     def build(self):
         pass
 
