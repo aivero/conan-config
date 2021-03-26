@@ -113,7 +113,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 dbg_file = f"{os.path.join(dbg_path, file)}.debug"
                 bin_file = os.path.join(root, file)
                 # Check if file has debug_info
-                stdout, _, _ = run("file", [bin_file], {"PATH": os.environ["PATH"]})
+                stdout, _, _ = run("file", [bin_file])
                 if not b"debug_info" in stdout:
                     # Some files without debug_info can still be stripped
                     if b"not stripped" in stdout:
