@@ -33,10 +33,6 @@ class Debug(ConanFile):
 """
 
 
-def env_prepend(var, val, sep=os.pathsep):
-    os.environ[var] = val + (sep + os.environ[var] if var in os.environ else "")
-
-
 def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     # Only create debug package when ending with -dbg
     if not conanfile.name.endswith("-dbg"):
@@ -50,28 +46,6 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
             repr(conanfile.settings),
         )
         cfile.write(content)
-
-
-def pre_build(output, conanfile, **kwargs):
-    assert conanfile
-    # Set debug prefix flags
-    if not hasattr(conanfile, "build_folder"):  # Needs build directory
-        return
-    env_prepend(
-        "CFLAGS",
-        "-fdebug-prefix-map=%s=%s" % (conanfile.build_folder, conanfile.name),
-        " ",
-    )
-    env_prepend(
-        "CXXFLAGS",
-        "-fdebug-prefix-map=%s=%s" % (conanfile.build_folder, conanfile.name),
-        " ",
-    )
-    env_prepend(
-        "RUSTFLAGS",
-        "--remap-path-prefix=%s=%s" % (conanfile.build_folder, conanfile.name),
-        " ",
-    )
 
 
 def run(exe, args=None, env=None):

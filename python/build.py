@@ -36,6 +36,10 @@ def env_replace(env_var, string, replace=""):
     os.environ[env_var] = os.environ[env_var].replace(string, replace)
 
 
+def env_prepend(var, val, sep=os.pathsep):
+    os.environ[var] = val + (sep + os.environ[var] if var in os.environ else "")
+
+
 def file_contains(file, strings):
     if strings is str:
         strings = [strings]
@@ -144,6 +148,23 @@ class Recipe(ConanFile):
         # Get version from git
         self.version = commit()
 
+    def set_env(self):
+        env_prepend(
+            "CFLAGS",
+            "-fdebug-prefix-map=%s=%s" % (self.build_folder, self.name),
+            " ",
+        )
+        env_prepend(
+            "CXXFLAGS",
+            "-fdebug-prefix-map=%s=%s" % (self.build_folder, self.name),
+            " ",
+        )
+        env_prepend(
+            "RUSTFLAGS",
+            "--remap-path-prefix=%s=%s" % (self.build_folder, self.name),
+            " ",
+        )
+
     @property
     def src(self):
         return f"{self.name}-{self.version}.src"
@@ -207,6 +228,7 @@ class Recipe(ConanFile):
         pass
 
     def meson(self, opts=None, source_folder=None):
+        self.set_env()
         args = [
             "--auto-features=disabled",
             "--wrap-mode=nofallback",
@@ -269,6 +291,7 @@ class Recipe(ConanFile):
         build_folder=None,
         install=True,
     ):
+        self.set_env()
         if defs is None:
             defs = {}
         if targets is str:
@@ -288,6 +311,7 @@ class Recipe(ConanFile):
                 cmake.install()
 
     def setuptools(self, source_folder=None):
+        self.set_env()
         if source_folder is None:
             source_folder = self.src
         py_path = os.path.join(
@@ -302,6 +326,7 @@ class Recipe(ConanFile):
         )
 
     def npm(self):
+        self.set_env()
         self.run(
             f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
         )
@@ -309,6 +334,7 @@ class Recipe(ConanFile):
     def autotools(
         self, args=None, source_folder=None, target="", make_args=None, env=None
     ):
+        self.set_env()
         if args is None:
             args = []
         if make_args is None:
@@ -355,6 +381,7 @@ class Recipe(ConanFile):
                     autotools.install(make_args)
 
     def make(self, args=None, source_folder=None, target="", env=None):
+        self.set_env()
         if args is None:
             args = []
         if source_folder is None:
@@ -370,6 +397,7 @@ class Recipe(ConanFile):
                 autotools.install(args)
 
     def cargo(self, args=None, source_folder=None, clean=None):
+        self.set_env()
         if args is None:
             args = []
         cache_folder = os.path.join(self.conan_home, "cache", "cargo")
@@ -377,13 +405,12 @@ class Recipe(ConanFile):
             os.makedirs(cache_folder)
         if clean:
             for pkg in clean:
-                self.exe(f"cargo clean -p", [pkg])
+                self.exe("cargo clean -p", [pkg])
         if self.settings.build_type in ("Release", "RelWithDebInfo"):
             args.append("--release")
         if source_folder is None:
             source_folder = self.src
-        self.exe("cargo build", args)
-        
+        self.exe("cargo build", args)        
 
 
 class RustRecipe(Recipe):
