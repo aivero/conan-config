@@ -55,21 +55,21 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
 def pre_build(output, conanfile, **kwargs):
     assert conanfile
     # Set debug prefix flags
-    if not hasattr(conanfile, "source_folder"):  # Needs source directory
+    if not hasattr(conanfile, "build_folder"):  # Needs build directory
         return
     env_prepend(
         "CFLAGS",
-        "-fdebug-prefix-map=%s=%s" % (conanfile.source_folder, conanfile.name),
+        "-fdebug-prefix-map=%s=%s" % (conanfile.build_folder, conanfile.name),
         " ",
     )
     env_prepend(
         "CXXFLAGS",
-        "-fdebug-prefix-map=%s=%s" % (conanfile.source_folder, conanfile.name),
+        "-fdebug-prefix-map=%s=%s" % (conanfile.build_folder, conanfile.name),
         " ",
     )
     env_prepend(
         "RUSTFLAGS",
-        "--remap-path-prefix=%s=%s" % (conanfile.source_folder, conanfile.name),
+        "--remap-path-prefix=%s=%s" % (conanfile.build_folder, conanfile.name),
         " ",
     )
 
