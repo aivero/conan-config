@@ -176,6 +176,12 @@ class Recipe(ConanFile):
             cwd = self.src
         self.run(f"{command} {' '.join(args)}", cwd=cwd)
 
+    def download(self, url, filename, dest_folder=None):
+        if not dest_folder:
+            dest_folder = self.src
+        tools.download(url, filename)
+        shutil.move(filename, os.path.join(dest_folder, filename))
+
     def get(self, url, dest_folder=None, src_folder=None):
         if not dest_folder:
             dest_folder = self.src
