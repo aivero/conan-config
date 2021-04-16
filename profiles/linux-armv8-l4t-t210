@@ -14,5 +14,6 @@ hardware.version=32.4.3
 hardware.board=t210
 deployment=False
 [options]
+librealsense:cuda=True
 [build_requires]
 [env]
