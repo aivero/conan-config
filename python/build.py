@@ -233,7 +233,7 @@ class Recipe(ConanFile):
     def package(self):
         pass
 
-    def meson(self, opts=None, source_folder=None):
+    def meson(self, opts=None, source_folder=None, opt_check=True):
         self.set_env()
         args = [
             "--auto-features=disabled",
@@ -247,39 +247,52 @@ class Recipe(ConanFile):
         meson_file = os.path.join(source_folder, "meson.build")
         if not os.path.exists(meson_file):
             raise Exception(f"meson.build not found: {meson_file}")
-        opts_data = json.loads(
-            call("meson", ["introspect", "--buildoptions", meson_file])
-        )
-        for (opt_name, opt_val) in opts.items():
-            opt_data = next(
-                (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
-                None,
+        if opt_check:
+            opts_data = json.loads(
+                call("meson", ["introspect", "--buildoptions", meson_file])
             )
-            if not opt_data:
-                raise Exception(f"Unrecognized Meson option: {opt_name}")
-            # Value checking
-            opt_val = str(opt_val)
-            if opt_data["type"] == "combo":
+            for (opt_name, opt_val) in opts.items():
+                opt_data = next(
+                    (
+                        opt_data
+                        for opt_data in opts_data
+                        if opt_name == opt_data["name"]
+                    ),
+                    None,
+                )
+                if not opt_data:
+                    raise Exception(f"Unrecognized Meson option: {opt_name}")
+                # Value checking
+                opt_val = str(opt_val)
+                if opt_data["type"] == "combo":
+                    if opt_val == "True":
+                        if "enabled" in opt_data["choices"]:
+                            opt_val = "enabled"
+                        elif "true" in opt_data["choices"]:
+                            opt_val = "true"
+                        elif "yes" in opt_data["choices"]:
+                            opt_val = "yes"
+                    elif opt_val == "False":
+                        if "disabled" in opt_data["choices"]:
+                            opt_val = "disabled"
+                        elif "false" in opt_data["choices"]:
+                            opt_val = "false"
+                        elif "no" in opt_data["choices"]:
+                            opt_val = "no"
+                    if opt_val not in opt_data["choices"]:
+                        raise Exception(f"Invalid {opt_name} value: {opt_val}")
+                if opt_data["type"] == "boolean":
+                    if opt_val not in ("True", "False"):
+                        raise Exception(f"Invalid {opt_name} value: {opt_val}")
+                args.append(f"-D{opt_name}={opt_val}")
+        else:
+            for (opt_name, opt_val) in opts.items():
+                opt_val = str(opt_val)
                 if opt_val == "True":
-                    if "enabled" in opt_data["choices"]:
-                        opt_val = "enabled"
-                    elif "true" in opt_data["choices"]:
-                        opt_val = "true"
-                    elif "yes" in opt_data["choices"]:
-                        opt_val = "yes"
+                    opt_val = "true"
                 elif opt_val == "False":
-                    if "disabled" in opt_data["choices"]:
-                        opt_val = "disabled"
-                    elif "false" in opt_data["choices"]:
-                        opt_val = "false"
-                    elif "no" in opt_data["choices"]:
-                        opt_val = "no"
-                if opt_val not in opt_data["choices"]:
-                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
-            if opt_data["type"] == "boolean":
-                if opt_val not in ("True", "False"):
-                    raise Exception(f"Invalid {opt_name} value: {opt_val}")
-            args.append(f"-D{opt_name}={opt_val}")
+                    opt_val = "false"
+                args.append(f"-D{opt_name}={opt_val}")
 
         meson = Meson(self)
         meson.configure(
@@ -416,7 +429,7 @@ class Recipe(ConanFile):
             args.append("--release")
         if source_folder is None:
             source_folder = self.src
-        self.exe("cargo build", args)        
+        self.exe("cargo build", args)
 
 
 class RustRecipe(Recipe):
