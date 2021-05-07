@@ -102,7 +102,7 @@ class Recipe(ConanFile):
     default_options = {"shared": True}
     _conan_home = None
     _conan_storage = None
-    requires = ("generators/[^1.0.0]", "private")
+    requires = (("generators/[^1.0.0]", "private"),)
 
     @property
     def conan_home(self):
