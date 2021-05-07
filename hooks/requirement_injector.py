@@ -7,6 +7,10 @@ def post_export(output, conanfile, conanfile_path, reference, **kwargs):
     with open(conanfile_path, "r") as cfile:
         content = cfile.read()
 
+    # Don't add generators req to generators
+    if conanfile.name == "generators":
+        return
+
     with open(conanfile_path, "w") as cfile:
         # TODO: create cleaner injection with regex or ast manipulation
 
