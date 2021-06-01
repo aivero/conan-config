@@ -160,11 +160,6 @@ class Recipe(ConanFile):
             "-fdebug-prefix-map=%s=%s" % (self.build_folder, self.name),
             " ",
         )
-        env_prepend(
-            "RUSTFLAGS",
-            "--remap-path-prefix=%s=%s" % (self.build_folder, self.name),
-            " ",
-        )
 
     @property
     def src(self):
