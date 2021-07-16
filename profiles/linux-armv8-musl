@@ -2,7 +2,7 @@
 os=Linux
 arch=armv8
 compiler=clang
-compiler.version=11
+compiler.version=12
 compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=musl
