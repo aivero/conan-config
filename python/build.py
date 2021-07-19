@@ -434,13 +434,20 @@ class RustRecipe(Recipe):
     settings = Recipe.settings + ("rust", )
 
     def package(self):
-        target_folder = self.env["CARGO_TARGET_DIR"]
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
+
         manifest_raw = call("cargo",
                             ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
+
+        metadata_raw = call("cargo",
+                            ["metadata", "--manifest-path", cargo_toml])
+        metadata = json.loads(metadata_raw)
+
+        target_folder = metadata["target_directory"]
+
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
             if "cdylib" in target["kind"] or "dylib" in target["kind"]:
