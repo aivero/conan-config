@@ -37,7 +37,8 @@ def env_replace(env_var, string, replace=""):
 
 
 def env_prepend(var, val, sep=os.pathsep):
-    os.environ[var] = val + (sep + os.environ[var] if var in os.environ else "")
+    os.environ[var] = val + (sep +
+                             os.environ[var] if var in os.environ else "")
 
 
 def file_contains(file, strings):
@@ -102,7 +103,7 @@ class Recipe(ConanFile):
     default_options = {"shared": True}
     _conan_home = None
     _conan_storage = None
-    requires = (("generators/[^1.0.0]", "private"),)
+    requires = (("generators/[^1.0.0]", "private"), )
 
     @property
     def conan_home(self):
@@ -115,7 +116,8 @@ class Recipe(ConanFile):
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call(sys.argv[0],
+                                   ["config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
@@ -245,15 +247,11 @@ class Recipe(ConanFile):
             raise Exception(f"meson.build not found: {meson_file}")
         if opt_check:
             opts_data = json.loads(
-                call("meson", ["introspect", "--buildoptions", meson_file])
-            )
+                call("meson", ["introspect", "--buildoptions", meson_file]))
             for (opt_name, opt_val) in opts.items():
                 opt_data = next(
-                    (
-                        opt_data
-                        for opt_data in opts_data
-                        if opt_name == opt_data["name"]
-                    ),
+                    (opt_data for opt_data in opts_data
+                     if opt_name == opt_data["name"]),
                     None,
                 )
                 if not opt_data:
@@ -329,9 +327,9 @@ class Recipe(ConanFile):
         self.set_env()
         if source_folder is None:
             source_folder = self.src
-        py_path = os.path.join(
-            self.package_folder, "lib", f"python{self.settings.python}", "site-packages"
-        )
+        py_path = os.path.join(self.package_folder, "lib",
+                               f"python{self.settings.python}",
+                               "site-packages")
         os.makedirs(py_path)
         os.environ["PYTHONPATH"] += py_path
         os.environ["SETUPTOOLS_SCM_PRETEND_VERSION"] = self.version
@@ -346,9 +344,12 @@ class Recipe(ConanFile):
             f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
         )
 
-    def autotools(
-        self, args=None, source_folder=None, target="", make_args=None, env=None
-    ):
+    def autotools(self,
+                  args=None,
+                  source_folder=None,
+                  target="",
+                  make_args=None,
+                  env=None):
         self.set_env()
         if args is None:
             args = []
@@ -368,7 +369,8 @@ class Recipe(ConanFile):
                 elif "configure.ac" in files:
                     self.run("autoreconf -ifv", cwd=source_folder)
                 else:
-                    raise Exception("No configure or autogen.sh in source folder")
+                    raise Exception(
+                        "No configure or autogen.sh in source folder")
             lib_type_works = file_contains(
                 os.path.join(source_folder, "configure"),
                 ["--enable-shared", "--enable-static"],
@@ -429,14 +431,18 @@ class Recipe(ConanFile):
 
 
 class RustRecipe(Recipe):
-    settings = Recipe.settings + ("rust",)
+    settings = Recipe.settings + ("rust", )
 
     def package(self):
-        target_folder = os.path.join(self.conan_home, "cache", "cargo")
+        target_folder = self.env["CARGO_TARGET_DIR"]
+        if target_folder is None:
+            target_folder = os.path.join(self.src, "target")
+
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo",
+                            ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # Automatically add cdylibs and bins
         for target in manifest["targets"]:
@@ -463,11 +469,11 @@ class RustRecipe(Recipe):
 
 
 class PythonRecipe(Recipe):
-    settings = Recipe.settings + ("python",)
+    settings = Recipe.settings + ("python", )
 
 
 class GstRecipe(Recipe):
-    settings = Recipe.settings + ("gstreamer",)
+    settings = Recipe.settings + ("gstreamer", )
 
 
 class Project(Recipe):
@@ -506,7 +512,8 @@ class GstRustProject(GstProject, RustProject):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
+        manifest_raw = call("cargo",
+                            ["read-manifest", "--manifest-path", cargo_toml])
         manifest = json.loads(manifest_raw)
         # (Copy gstreamer elements to lib/streamer-1.0)
         for target in manifest["targets"]:
