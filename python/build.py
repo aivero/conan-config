@@ -435,9 +435,6 @@ class RustRecipe(Recipe):
 
     def package(self):
         target_folder = self.env["CARGO_TARGET_DIR"]
-        if target_folder is None:
-            target_folder = os.path.join(self.src, "target")
-
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
