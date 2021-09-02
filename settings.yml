@@ -7,7 +7,7 @@ arch_target:       [x86, x86_64, ppc32be, ppc32, ppc64le, ppc64, armv5el, armv5h
 release: ANY
 deployment:        [True, False]
 gstreamer:         ["1.16", "1.18", "1.19", "1.20"]
-python:            ["3.8"]
+python:            ["3.8", "3.9"]
 rust:              ["1.48", "1.49", "1.50", "1.51", "1.52", "1.53"]
 hardware:
   l4t:
