@@ -338,6 +338,15 @@ class Recipe(ConanFile):
             cwd=source_folder,
         )
 
+    def pip(self):
+        self.set_env()
+        self.run(f"pip install --prefix={self.package_folder} -r requirements.txt")
+        py_path = os.path.join(self.package_folder, "lib",
+                               f"python{self.settings.python}",
+                               "site-packages")
+        os.environ["PYTHONPATH"] += py_path
+
+
     def npm(self):
         self.set_env()
         self.run(
