@@ -48,7 +48,7 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     if os.path.isdir(share_path):
         conanfile.env_info.XDG_DATA_DIRS.append(share_path)
 
-    gst_plugin_path = os.path.join(conanfile.cpp_info.rootpath, "lib", "")
+    gst_plugin_path = os.path.join(conanfile.cpp_info.rootpath, "lib", "gstreamer-1.0")
     if os.path.isdir(gst_plugin_path):
         conanfile.env_info.GST_PLUGIN_PATH.append(gst_plugin_path)
 
