@@ -332,7 +332,7 @@ class Recipe(ConanFile):
                                "site-packages")
         os.makedirs(py_path)
         if "PYTHONPATH" in os.environ:
-            os.environ["PYTHONPATH"] += py_path
+            os.environ["PYTHONPATH"] += os.pathsep + py_path
         else:
             os.environ["PYTHONPATH"] = py_path
         os.environ["SETUPTOOLS_SCM_PRETEND_VERSION"] = self.version
@@ -347,7 +347,7 @@ class Recipe(ConanFile):
         py_path = os.path.join(self.package_folder, "lib",
                                f"python{self.settings.python}",
                                "site-packages")
-        os.environ["PYTHONPATH"] += py_path
+        os.environ["PYTHONPATH"] += os.pathsep + py_path
 
 
     def npm(self):
