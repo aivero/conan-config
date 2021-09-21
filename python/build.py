@@ -331,7 +331,10 @@ class Recipe(ConanFile):
                                f"python{self.settings.python}",
                                "site-packages")
         os.makedirs(py_path)
-        os.environ["PYTHONPATH"] += py_path
+        if "PYTHONPATH" in os.environ:
+            os.environ["PYTHONPATH"] += py_path
+        else:
+            os.environ["PYTHONPATH"] = py_path
         os.environ["SETUPTOOLS_SCM_PRETEND_VERSION"] = self.version
         self.run(
             f'python setup.py install --optimize=1 --prefix= --root="{self.package_folder}"',
