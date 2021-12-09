@@ -76,7 +76,8 @@ def pre_build(output, conanfile, **kwargs):
     workspace_path = "Cargo.toml"
     workspace = {
         "workspace": {
-            "members": deps
+            "members": deps,
+            "resolver": "2"
         }
     }
     with open(workspace_path, 'w') as f:
