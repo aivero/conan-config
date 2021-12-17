@@ -163,6 +163,9 @@ class Recipe(ConanFile):
             " ",
         )
 
+    def package_id(self):
+        self.info.requires.unrelated_mode()
+
     @property
     def src(self):
         return f"{self.name}-{self.version}.src"
@@ -496,9 +499,6 @@ class Project(Recipe):
     @property
     def src(self):
         return "."
-
-    def package_id(self):
-        self.info.requires.unrelated_mode()
 
 
 class GstProject(Project, GstRecipe):
