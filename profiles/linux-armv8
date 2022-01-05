@@ -2,12 +2,12 @@
 os=Linux
 arch=armv8
 compiler=clang
-compiler.version=12
+compiler.version=13
 compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=glibc
 gstreamer=1.20
-python=3.9
+python=3.8
 rust=1.56
 hardware=generic
 deployment=False
