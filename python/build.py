@@ -353,7 +353,7 @@ class Recipe(ConanFile):
     def npm(self):
         self.set_env()
         self.run(
-            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
+            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}"'
         )
 
     def autotools(self,
