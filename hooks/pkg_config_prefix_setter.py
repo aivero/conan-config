@@ -1,4 +1,5 @@
 import os
+from build import file_contains
 
 
 def replace_prefix_in_pc_file(pc_file, prefix):
@@ -39,6 +40,7 @@ def post_download_package(output, conanfile_path, reference, package_id, remote,
             continue
         for pc in os.listdir(pc_path):
             pc_file = os.path.join(pc_path, pc)
-            content = replace_prefix_in_pc_file(pc_file, rootpath)
-            with open(pc_file, 'w') as f:
-                f.write(content)
+            if file_contains(pc_file, "prefix="):
+                content = replace_prefix_in_pc_file(pc_file, rootpath)
+                with open(pc_file, 'w') as f:
+                    f.write(content)
