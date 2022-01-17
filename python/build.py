@@ -42,7 +42,7 @@ def env_prepend(var, val, sep=os.pathsep):
 
 
 def file_contains(file, strings):
-    if strings is str:
+    if isinstance(strings, str):
         strings = [strings]
     with open(file, "r", encoding="utf-8") as f:
         content = f.read()
