@@ -42,7 +42,7 @@ def env_prepend(var, val, sep=os.pathsep):
 
 
 def file_contains(file, strings):
-    if strings is str:
+    if isinstance(strings, str):
         strings = [strings]
     with open(file, "r", encoding="utf-8") as f:
         content = f.read()
@@ -66,8 +66,8 @@ def commit():
     global _commit
     if _commit:
         return _commit
-    if "GITHUB_SHA" in os.environ:
-        _commit = os.environ["GITHUB_SHA"]
+    if "CI_COMMIT_SHA" in os.environ:
+        _commit = os.environ["CI_COMMIT_SHA"]
         return _commit
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
@@ -84,8 +84,8 @@ def branch():
     global _branch
     if _branch:
         return _branch
-    if "GIT_REF" in os.environ:
-        _branch = os.environ["GIT_REF"]
+    if "CI_COMMIT_REF_NAME" in os.environ:
+        _branch = os.environ["CI_COMMIT_REF_NAME"]
         return _branch
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
@@ -353,7 +353,7 @@ class Recipe(ConanFile):
     def npm(self):
         self.set_env()
         self.run(
-            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}-{self.version}"'
+            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}"'
         )
 
     def autotools(self,
@@ -496,9 +496,6 @@ class Project(Recipe):
     @property
     def src(self):
         return "."
-
-    def package_id(self):
-        self.info.requires.unrelated_mode()
 
 
 class GstProject(Project, GstRecipe):

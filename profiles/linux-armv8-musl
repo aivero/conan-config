@@ -6,9 +6,9 @@ compiler.version=12
 compiler.libcxx=libc++
 build_type=RelWithDebInfo
 libc=musl
-gstreamer=1.19
-python=3.9
+gstreamer=1.20
 rust=1.56
+python=3.8
 hardware=generic
 deployment=False
 [options]
