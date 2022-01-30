@@ -1,5 +1,5 @@
 # Conan config
-This repository contains all the shared conan configuration.
+Aivero conan configuration
 
 ## Install
 ### Install config
