@@ -86,7 +86,7 @@ def branch():
         return _branch
     if "CI_COMMIT_REF_NAME" in os.environ:
         _branch = os.environ["CI_COMMIT_REF_NAME"]
-        return _branch
+        return _branch[:50]
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
             _branch = yaml.load(metadata_file)["branch"]
@@ -94,7 +94,7 @@ def branch():
     _branch = call("git", ["rev-parse", "--abbrev-ref", "HEAD"])[:-1]
     if _branch == "":
         _branch = "detached-head"
-    return _branch
+    return _branch[:50]
 
 
 class Recipe(ConanFile):
