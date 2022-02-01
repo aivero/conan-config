@@ -425,7 +425,7 @@ class Recipe(ConanFile):
                 autotools.make(args)
                 autotools.install(args)
 
-    def cargo(self, args=None, source_folder=None, clean=None):
+    def cargo(self, args=None, source_folder=None, clean=None, test=True):
         self.set_env()
         if args is None:
             args = []
@@ -440,6 +440,8 @@ class Recipe(ConanFile):
         if source_folder is None:
             source_folder = self.src
         self.exe("cargo build", args)
+        if test:
+            self.exe("cargo test")
 
 
 class RustRecipe(Recipe):
