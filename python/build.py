@@ -441,7 +441,7 @@ class Recipe(ConanFile):
             source_folder = self.src
         self.exe("cargo build", args)
         if test:
-            self.exe("cargo test")
+            self.exe("cargo test", args)
 
 
 class RustRecipe(Recipe):
