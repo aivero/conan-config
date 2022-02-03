@@ -42,7 +42,12 @@ def pre_package_info(output, conanfile, reference, **kwargs):
     gir_path = os.path.join(conanfile.cpp_info.rootpath,
                             "lib", "girepository-1.0")
     if os.path.isdir(gir_path):
-        conanfile.env_info.GI_TYPELIB_PATH.append(os.path.join(gir_path))
+        conanfile.env_info.GI_TYPELIB_PATH.append(gir_path)
+
+    gio_path = os.path.join(conanfile.cpp_info.rootpath,
+                            "lib", "gio", "modules")
+    if os.path.isdir(gio_path):
+        conanfile.env_info.GIO_EXTRA_MODULES.append(gio_path)
 
     share_path = os.path.join(conanfile.cpp_info.rootpath, "share")
     if os.path.isdir(share_path):
