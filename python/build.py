@@ -162,6 +162,8 @@ class Recipe(ConanFile):
             "-fdebug-prefix-map=%s=%s" % (self.build_folder, self.name),
             " ",
         )
+        # Don't run husky in conan/cicd
+        os.environ["CARGO_HUSKY_DONT_INSTALL_HOOKS"] = "true"
 
     @property
     def src(self):
