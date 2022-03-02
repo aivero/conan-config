@@ -6,10 +6,10 @@ def write_metadata(path, key, val):
     metadata_path = os.path.join(path, METADATA_FILE)
     if os.path.exists(metadata_path):
         with open(metadata_path) as metadata_file:
-            metadata = yaml.load(metadata_file)
+            metadata = yaml.load(metadata_file, Loader=yaml.Loader)
     metadata[key] = val
     with open(metadata_path, "w") as metadata_file:
-        yaml.dump(metadata, metadata_file)
+        yaml.dump(metadata, metadata_file, Dumper=yaml.Dumper)
 
 
 def pre_export(output, conanfile, conanfile_path, **kwargs):

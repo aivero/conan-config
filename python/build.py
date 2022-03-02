@@ -56,7 +56,7 @@ def read_metadata(key):
     metadata = {}
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
-            return yaml.load(metadata_file)[key]
+            return yaml.load(metadata_file, Loader=yaml.Loader)[key]
 
 
 _commit = None
@@ -71,7 +71,7 @@ def commit():
         return _commit
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
-            _commit = yaml.load(metadata_file)["commit"]
+            _commit = yaml.load(metadata_file, Loader=yaml.Loader)["commit"]
             return _commit
     _commit = call("git", ["rev-parse", "HEAD"])[:-1]
     return _commit
@@ -89,7 +89,7 @@ def branch():
         return _branch[:50]
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE) as metadata_file:
-            _branch = yaml.load(metadata_file)["branch"]
+            _branch = yaml.load(metadata_file, Loader=yaml.Loader)["branch"]
             return _branch
     _branch = call("git", ["rev-parse", "--abbrev-ref", "HEAD"])[:-1]
     if _branch == "":
