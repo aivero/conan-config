@@ -24,6 +24,12 @@ hardware:
       version:     ["10", "20"]
       # RPi4: pi4
       board:       ["pi4"]
+  odroid:
+    # Odroid devices
+      # os flashed on odroid
+      version:     ["ubuntu", "android"]
+      # Odroid: n2
+      board:       ["n2"]
   generic: ~
 
 build_type:        [None, Debug, Release, RelWithDebInfo, MinSizeRel]
