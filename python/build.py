@@ -447,27 +447,28 @@ class RustRecipe(Recipe):
         target_folder = metadata["target_directory"]
 
         # Automatically add cdylibs and bins
-        for target in metadata["targets"]:
-            if "cdylib" in target["kind"] or "dylib" in target["kind"]:
-                name = target["name"].replace("-", "_")
-                target = f"lib{name}.so"
-                dest_folder = "lib"
-            elif "bin" in target["kind"]:
-                target = target["name"]
-                dest_folder = "bin"
-            else:
-                continue
+        for package in metadata["packages"]:
+            for target in package["targets"]:
+                if "cdylib" in target["kind"] or "dylib" in target["kind"]:
+                    name = target["name"].replace("-", "_")
+                    target = f"lib{name}.so"
+                    dest_folder = "lib"
+                elif "bin" in target["kind"]:
+                    target = target["name"]
+                    dest_folder = "bin"
+                else:
+                    continue
 
-            if self.settings.build_type in ("Release", "RelWithDebInfo"):
-                build_dir = "release"
-            else:
-                build_dir = "debug"
-            target_path = os.path.join(target_folder, build_dir, target)
-            dest_path = os.path.join(self.package_folder, dest_folder)
-            if not os.path.exists(dest_path):
-                os.makedirs(dest_path)
-            if os.path.exists(target_path):
-                shutil.copy(target_path, os.path.join(dest_path, target))
+                if self.settings.build_type in ("Release", "RelWithDebInfo"):
+                    build_dir = "release"
+                else:
+                    build_dir = "debug"
+                target_path = os.path.join(target_folder, build_dir, target)
+                dest_path = os.path.join(self.package_folder, dest_folder)
+                if not os.path.exists(dest_path):
+                    os.makedirs(dest_path)
+                if os.path.exists(target_path):
+                    shutil.copy(target_path, os.path.join(dest_path, target))
 
 
 class PythonRecipe(Recipe):
@@ -516,28 +517,29 @@ class GstRustProject(GstProject, RustProject):
         metadata = json.loads(metadata_raw)
 
         # (Copy gstreamer elements to lib/streamer-1.0)
-        for target in metadata["targets"]:
-            if "cdylib" in target["kind"]:
-                name = target["name"].replace("-", "_")
-                target = f"lib{name}.so"
-                dest_folder = os.path.join("lib", "gstreamer-1.0")
-            elif "dylib" in target["kind"]:
-                name = target["name"].replace("-", "_")
-                target = f"lib{name}.so"
-                dest_folder = "lib"
-            elif "bin" in target["kind"]:
-                target = target["name"]
-                dest_folder = "bin"
-            else:
-                continue
+        for package in metadata["packages"]:
+            for target in package["targets"]:
+                if "cdylib" in target["kind"]:
+                    name = target["name"].replace("-", "_")
+                    target = f"lib{name}.so"
+                    dest_folder = os.path.join("lib", "gstreamer-1.0")
+                elif "dylib" in target["kind"]:
+                    name = target["name"].replace("-", "_")
+                    target = f"lib{name}.so"
+                    dest_folder = "lib"
+                elif "bin" in target["kind"]:
+                    target = target["name"]
+                    dest_folder = "bin"
+                else:
+                    continue
 
-            if self.settings.build_type in ("Release", "RelWithDebInfo"):
-                build_dir = "release"
-            else:
-                build_dir = "debug"
-            target_path = os.path.join(target_folder, build_dir, target)
-            dest_path = os.path.join(self.package_folder, dest_folder)
-            if not os.path.exists(dest_path):
-                os.makedirs(dest_path)
-            if os.path.exists(target_path):
-                shutil.copy(target_path, os.path.join(dest_path, target))
+                if self.settings.build_type in ("Release", "RelWithDebInfo"):
+                    build_dir = "release"
+                else:
+                    build_dir = "debug"
+                target_path = os.path.join(target_folder, build_dir, target)
+                dest_path = os.path.join(self.package_folder, dest_folder)
+                if not os.path.exists(dest_path):
+                    os.makedirs(dest_path)
+                if os.path.exists(target_path):
+                    shutil.copy(target_path, os.path.join(dest_path, target))
