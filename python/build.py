@@ -349,9 +349,7 @@ class Recipe(ConanFile):
 
     def npm(self):
         self.set_env()
-        self.run(
-            f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}"'
-        )
+        self.run(f'npm install -g --user root --prefix "{self.package_folder}" "{self.name}"')
 
     def autotools(self, args=None, source_folder=None, target="", make_args=None, env=None):
         self.set_env()
@@ -513,10 +511,12 @@ class GstRustProject(GstProject, RustProject):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
-        manifest_raw = call("cargo", ["read-manifest", "--manifest-path", cargo_toml])
-        manifest = json.loads(manifest_raw)
+
+        metadata_raw = call("cargo", ["metadata", "--no-deps", "--manifest-path", cargo_toml])
+        metadata = json.loads(metadata_raw)
+
         # (Copy gstreamer elements to lib/streamer-1.0)
-        for target in manifest["targets"]:
+        for target in metadata["targets"]:
             if "cdylib" in target["kind"]:
                 name = target["name"].replace("-", "_")
                 target = f"lib{name}.so"
