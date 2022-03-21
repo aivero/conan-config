@@ -441,7 +441,9 @@ class RustRecipe(Recipe):
         if not os.path.exists(cargo_toml):
             return
 
-        metadata_raw = call("cargo", ["metadata", "--no-deps", "--manifest-path", cargo_toml])
+        metadata_raw = call(
+            "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
+        )
         metadata = json.loads(metadata_raw)
 
         target_folder = metadata["target_directory"]
@@ -513,7 +515,9 @@ class GstRustProject(GstProject, RustProject):
         if not os.path.exists(cargo_toml):
             return
 
-        metadata_raw = call("cargo", ["metadata", "--no-deps", "--manifest-path", cargo_toml])
+        metadata_raw = call(
+            "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
+        )
         metadata = json.loads(metadata_raw)
 
         # (Copy gstreamer elements to lib/streamer-1.0)
