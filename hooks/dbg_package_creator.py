@@ -81,11 +81,11 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             for file in files:
                 if not regex.match(file):
                     continue
-                dbg_path = os.path.join(conanfile.package_folder, "dbg", root[1:])
+                bin_file = os.path.join(root, file)
+                dbg_path = os.path.join(os.path.dirname(bin_file), ".debug")
                 if not os.path.exists(dbg_path):
                     os.makedirs(dbg_path)
                 dbg_file = f"{os.path.join(dbg_path, file)}.debug"
-                bin_file = os.path.join(root, file)
                 # Check if file has debug_info
                 stdout, _, _ = run("file", [bin_file])
                 if not b"debug_info" in stdout:
@@ -93,6 +93,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                     if b"not stripped" in stdout:
                         run("strip", ["--strip-all", bin_file])
                     continue
+                print("Stripping file: " + bin_file +"\nDebug file at: " + dbg_file)
                 # Extract debug info to debug file
                 run("objcopy", ["--only-keep-debug", bin_file, dbg_file])
                 # Strip binary
@@ -107,18 +108,14 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
             if regex.match(file):
                 rel_path = os.path.relpath(root, conanfile.build_folder)
                 file_path = os.path.join(conanfile.build_folder, rel_path, file)
-                file_dest_path = os.path.join(
-                    conanfile.package_folder, "src", rel_path, file
-                )
+                file_dest_path = os.path.join(conanfile.package_folder, "src", rel_path, file)
                 if not os.path.exists(os.path.dirname(file_dest_path)):
                     os.makedirs(os.path.dirname(file_dest_path))
                 shutil.copy(file_path, file_dest_path)
 
 
 def pre_upload_package(output, conanfile_path, reference, package_id, remote, **kwargs):
-    package_folder = conanfile_path.replace(
-        "export/conanfile.py", f"package/{package_id}"
-    )
+    package_folder = conanfile_path.replace("export/conanfile.py", f"package/{package_id}")
 
     # Don't cleanup package for debug packages
     if reference.name.endswith("-dbg"):
