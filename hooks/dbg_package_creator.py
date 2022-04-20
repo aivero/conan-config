@@ -82,6 +82,9 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 if not regex.match(file):
                     continue
                 bin_file = os.path.join(root, file)
+                # see https://www.zeuthen.desy.de/dv/documentation/unixguide/infohtml/gdb/Separate-Debug-Files.html
+                # `...gdb looks up the named file in the directory of the executable file, 
+                #  then in a subdirectory of that directory named .debug,...`
                 dbg_path = os.path.join(os.path.dirname(bin_file), ".debug")
                 if not os.path.exists(dbg_path):
                     os.makedirs(dbg_path)
