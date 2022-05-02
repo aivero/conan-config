@@ -13,7 +13,5 @@ hardware=l4t
 hardware.version=32.4.3
 hardware.board=t210
 deployment=False
-[options]
-librealsense:cuda=False
 [build_requires]
 [env]
