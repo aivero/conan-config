@@ -85,7 +85,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 # see https://www.zeuthen.desy.de/dv/documentation/unixguide/infohtml/gdb/Separate-Debug-Files.html
                 # `...gdb looks up the named file in the directory of the executable file, 
                 #  then in a subdirectory of that directory named .debug,...`
-                dbg_path = os.path.join(os.path.dirname(bin_file), ".debug")
+                dbg_path = os.path.join(conanfile.package_folder, "dbg", root[1:])
                 if not os.path.exists(dbg_path):
                     os.makedirs(dbg_path)
                 dbg_file = f"{os.path.join(dbg_path, file)}.debug"
