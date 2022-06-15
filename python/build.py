@@ -185,15 +185,16 @@ class Recipe(ConanFile):
             dest_folder = self.src
         tmp_folder = "get_tmp_folder"
         tools.get(url, destination=tmp_folder)
-        for _, folders, _ in os.walk(tmp_folder):
-            if len(folders) > 1 and not src_folder:
-                raise Exception(
-                    "Cannot determine which folder to rename. Please set folder argument."
-                )
-            else:
-                folder = folders[0]
-                break
-        shutil.move(os.path.join(tmp_folder, folder), dest_folder)
+        if not src_folder:
+            for _, folders, _ in os.walk(tmp_folder):
+                if len(folders) > 1:
+                    raise Exception(
+                        "Cannot determine which folder to rename. Please set folder argument."
+                    )
+                else:
+                    src_folder = folders[0]
+                    break
+        shutil.move(os.path.join(tmp_folder, src_folder), dest_folder)
         shutil.rmtree(tmp_folder)
 
     def patch(self, patch, folder=None):
