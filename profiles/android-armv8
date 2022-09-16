@@ -8,7 +8,7 @@ compiler.libcxx=libc++
 libc=bionic
 gstreamer=1.21
 python=3.8
-rust=1.61
+rust=1.63
 hardware=generic
 deployment=False
 [options]
