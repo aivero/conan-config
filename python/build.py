@@ -437,6 +437,16 @@ class Recipe(ConanFile):
 class RustRecipe(Recipe):
     settings = Recipe.settings + ("rust",)
 
+    def export_sources(self):
+        cargo_toml = os.path.join(self.recipe_folder, "Cargo.toml")
+        metadata_raw = call(
+            "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
+        )
+        metadata = json.loads(metadata_raw)
+
+        self.copy("Cargo.lock", src=metadata["workspace_root"], dst=".", keep_path=True)
+        self.copy("rustfmt.toml", src=metadata["workspace_root"], dst=".", keep_path=True)
+
     def package(self):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
