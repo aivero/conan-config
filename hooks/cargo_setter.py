@@ -25,8 +25,7 @@ def copy_dependency(project_path, origin):
     if "dependencies" in cargo:
         for _, dep in cargo["dependencies"].items():
             if "path" in dep and ".." in dep["path"]:
-                src = os.path.realpath(os.path.join(
-                    origin, dep["path"]))
+                src = os.path.realpath(os.path.join(origin, dep["path"]))
                 dst = os.path.realpath(os.path.join(project_path, dep["path"]))
                 copytree(src, dst)
                 deps += copy_dependency(dst, src)
@@ -55,7 +54,7 @@ def post_source(output, conanfile, **kwargs):
         if not semver.parse(version, loose=True):
             version = f"0.0.0-{version}"
         cargo["package"]["version"] = version.replace("_", "-")
-        with open(cargo_path, 'w') as f:
+        with open(cargo_path, "w") as f:
             toml.dump(cargo, f)
 
 
@@ -68,17 +67,19 @@ def pre_build(output, conanfile, **kwargs):
     src = os.path.join(conanfile.source_folder, conanfile.src)
     deps = copy_dependency(src, os.environ["ORIGIN_FOLDER"])
 
+    # Copy Cargo.lock and rustfmt.toml to workspace as well
+    cargolock_toml = os.path.join(src, "Cargo.lock")
+    rustfmt_toml = os.path.join(src, "rustfmt.toml")
+    if os.path.exists(cargolock_toml):
+        shutil.copy2(cargolock_toml, "Cargo.lock")
+    if os.path.exists(rustfmt_toml):
+        shutil.copy2(rustfmt_toml, "rustfmt.toml")
+
     # Get relative path to deps
-    deps = list(map(lambda dep: os.path.relpath(
-        dep, conanfile.source_folder), deps))
+    deps = list(map(lambda dep: os.path.relpath(dep, conanfile.source_folder), deps))
 
     # Create workspace
     workspace_path = "Cargo.toml"
-    workspace = {
-        "workspace": {
-            "members": deps,
-            "resolver": "2"
-        }
-    }
-    with open(workspace_path, 'w') as f:
+    workspace = {"workspace": {"members": deps, "resolver": "2"}}
+    with open(workspace_path, "w") as f:
         toml.dump(workspace, f)
