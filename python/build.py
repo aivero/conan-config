@@ -438,14 +438,20 @@ class RustRecipe(Recipe):
     settings = Recipe.settings + ("rust",)
 
     def export_sources(self):
-        cargo_toml = os.path.join(self.recipe_folder, "Cargo.toml")
-        metadata_raw = call(
-            "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
-        )
-        metadata = json.loads(metadata_raw)
+        cargo_lock = os.path.join(self.recipe_folder, "Cargo.lock")
+        while not os.path.exists(cargo_lock) and cargo_lock != "/Cargo.lock":
+            cargo_lock = os.path.dirname(os.path.dirname(cargo_lock))
+            cargo_lock = os.path.join(cargo_lock, "Cargo.lock")
 
-        self.copy("Cargo.lock", src=metadata["workspace_root"], dst=".", keep_path=True)
-        self.copy("rustfmt.toml", src=metadata["workspace_root"], dst=".", keep_path=True)
+        rustfmt_toml = os.path.join(self.recipe_folder, "rustfmt.toml")
+        while not os.path.exists(rustfmt_toml) and rustfmt_toml != "/rustfmt.toml":
+            rustfmt_toml = os.path.dirname(os.path.dirname(rustfmt_toml))
+            rustfmt_toml = os.path.join(rustfmt_toml, "rustfmt.toml")
+
+        if os.path.exists(cargo_lock):
+            self.copy("Cargo.lock", src=os.path.dirname(cargo_lock), dst=".", keep_path=True)
+        if os.path.exists(rustfmt_toml):
+            self.copy("rustfmt.toml", src=os.path.dirname(rustfmt_toml), dst=".", keep_path=True)
 
     def package(self):
         cargo_toml = os.path.join(self.src, "Cargo.toml")
