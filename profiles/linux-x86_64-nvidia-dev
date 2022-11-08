@@ -5,13 +5,14 @@ compiler=clang
 compiler.version=14
 compiler.libcxx=libc++
 build_type=RelWithDebInfo
-libc=musl
+libc=glibc
 gstreamer=1.21
 rust=1.63
 python=3.8
 hardware=generic
-hardware.gpu=unspecified
+hardware.gpu=nvidia
 deployment=False
 [options]
+gst-plugins-bad:x265=True
 [build_requires]
 [env]

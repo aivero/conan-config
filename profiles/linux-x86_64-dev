@@ -10,6 +10,7 @@ gstreamer=1.21
 rust=1.63
 python=3.8
 hardware=generic
+hardware.gpu=unspecified
 deployment=False
 [options]
 gst-plugins-bad:x265=True

@@ -31,7 +31,8 @@ hardware:
       version:     ["ubuntu", "android"]
       # Odroid: n2
       board:       ["n2"]
-  generic: ~
+  generic:
+      gpu:         ["unspecified", "nvidia", "amd"]
 
 build_type:        [None, Debug, Release, RelWithDebInfo, MinSizeRel]
 
