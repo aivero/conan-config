@@ -32,7 +32,7 @@ hardware:
       # Odroid: n2
       board:       ["n2"]
   generic:
-      gpu:         ["unspecified", "nvidia", "amd"]
+dedicated_gpu:     [None, nvidia, amd]
 
 build_type:        [None, Debug, Release, RelWithDebInfo, MinSizeRel]
 
