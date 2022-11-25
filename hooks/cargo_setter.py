@@ -33,7 +33,7 @@ def copy_dependency(project_path, origin):
 
 
 def post_source(output, conanfile, **kwargs):
-    if conanfile.has_workspace:
+    if hasattr(conanfile, 'has_workspace') and conanfile.has_workspace:
         return
     assert conanfile
     if not isinstance(conanfile, RustProject):
@@ -64,7 +64,7 @@ def pre_build(output, conanfile, **kwargs):
     assert conanfile
     if not isinstance(conanfile, RustProject):
         return
-    if conanfile.has_workspace:
+    if hasattr(conanfile, 'has_workspace') and conanfile.has_workspace:
         return
 
     # Copy dependency source files to source folder
