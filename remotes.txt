@@ -1,6 +1,6 @@
-dev-all https://aivero.jfrog.io/artifactory/api/conan/dev-all True
-dev-internal https://aivero.jfrog.io/artifactory/api/conan/dev-internal True
-dev-public https://aivero.jfrog.io/artifactory/api/conan/dev-public True
-aivero-all https://aivero.jfrog.io/artifactory/api/conan/aivero-all True
-aivero-internal https://aivero.jfrog.io/artifactory/api/conan/aivero-internal True
-aivero-public https://aivero.jfrog.io/artifactory/api/conan/aivero-public True
+aivero-all https://conan.aivero.dev/artifactory/api/conan/aivero-all True
+aivero-internal https://conan.aivero.dev/artifactory/api/conan/aivero-internal True
+aivero-public https://conan.aivero.dev/artifactory/api/conan/aivero-public True
+dev-all https://conan.aivero.dev/artifactory/api/conan/dev-all True
+dev-internal https://conan.aivero.dev/artifactory/api/conan/dev-internal True
+dev-public https://conan.aivero.dev/artifactory/api/conan/dev-public True
