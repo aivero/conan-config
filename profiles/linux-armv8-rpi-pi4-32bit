@@ -1,6 +1,6 @@
 [settings]
 os=Linux
-arch=armv8
+arch=armv8_32
 compiler=clang
 compiler.version=14
 compiler.libcxx=libc++
@@ -10,7 +10,7 @@ gstreamer=1.21
 rust=1.63
 python=3.8
 hardware=rpi
-hardware.version=20
+hardware.version=10
 hardware.board=pi4
 deployment=False
 [options]
