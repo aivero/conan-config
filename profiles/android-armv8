@@ -3,12 +3,12 @@ os=Android
 os.api_level=28
 arch=armv8
 compiler=clang
-compiler.version=14
+compiler.version=15
 compiler.libcxx=libc++
 libc=bionic
 gstreamer=1.21
 python=3.8
-rust=1.63
+rust=1.66
 hardware=generic
 deployment=False
 [options]
