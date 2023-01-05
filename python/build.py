@@ -97,7 +97,7 @@ def branch():
 
 
 class Recipe(ConanFile):
-    settings = "build_type", "compiler", "arch", "os", "libc"
+    settings = "build_type", "arch", "os", "libc"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
     _conan_home = None
