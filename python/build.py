@@ -16,13 +16,8 @@ DEVOPS_FILE = "devops.yml"
 
 
 def call(cmd, args, show=False):
-    result = subprocess.run([cmd] + args, capture_output=True)
-    stdout = result.stdout.decode("utf-8")
-    if result.returncode != 0:
-        stderr = result.stderr.decode("utf-8")
-        raise RuntimeError(" ".join([cmd] + args) + "\nstdout: " + stdout + "\nstderr: " + stderr)
-
-    return stdout
+    result = subprocess.run([cmd] + args, check=True, capture_output=True)
+    return result.stdout.decode("utf-8")
 
 
 def env_replace(env_var, string, replace=""):
