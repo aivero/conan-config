@@ -28,7 +28,7 @@ def call(cmd, args, show=False):
             fulloutput += output
     fulloutput = fulloutput.decode("utf-8")
     if child.poll() != 0:
-        raise RuntimeError(fulloutput)
+        raise RuntimeError(" ".join([cmd] + args) + "\n" + fulloutput)
     return fulloutput
 
 
