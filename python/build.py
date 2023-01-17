@@ -16,8 +16,13 @@ DEVOPS_FILE = "devops.yml"
 
 
 def call(cmd, args, show=False):
-    result = subprocess.run([cmd] + args, check=True, capture_output=True)
-    return result.stdout.decode("utf-8")
+    result = subprocess.run([cmd] + args, capture_output=True)
+    stdout = result.stdout.decode("utf-8")
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8")
+        raise RuntimeError(" ".join([cmd] + args) + "\nstdout: " + stdout + "\nstderr: " + stderr)
+
+    return stdout
 
 
 def env_replace(env_var, string, replace=""):
@@ -96,14 +101,14 @@ class Recipe(ConanFile):
     def conan_home(self):
         if self._conan_home:
             return self._conan_home
-        self._conan_home = call(sys.argv[0], ["config", "home"])[:-1]
+        self._conan_home = call("env", ["-i", sys.argv[0], "config", "home"])[:-1]
         return self._conan_home
 
     @property
     def conan_storage(self):
         if self._conan_storage:
             return self._conan_storage
-        self._conan_storage = call(sys.argv[0], ["config", "get", "storage.path"])[:-1]
+        self._conan_storage = call("env", ["-i", sys.argv[0], "config", "get", "storage.path"])[:-1]
         return self._conan_storage
 
     def set_name(self):
