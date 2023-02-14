@@ -24,7 +24,7 @@ hardware:
       # Raspbian os version, if installed 
       version:     ["10", "20"]
       # RPi4: pi4
-      board:       ["pi4"]
+      board:       ["pi3", "pi4"]
   odroid:
     # Odroid devices
       # os flashed on odroid
