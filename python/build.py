@@ -494,6 +494,11 @@ class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
 
 
+class PipRecipe(PythonRecipe):
+    def build(self):
+        self.run(f"pip install -Iv --prefix={self.package_folder} {'-'.join(self.name.split('-')[1::])}=={self.version}")
+
+
 class GstRecipe(Recipe):
     settings = Recipe.settings + ("gstreamer",)
 
