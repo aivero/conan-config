@@ -496,7 +496,8 @@ class PythonRecipe(Recipe):
 
 class PipRecipe(PythonRecipe):
     def build(self):
-        self.run(f"pip install -Iv --prefix={self.package_folder} {'-'.join(self.name.split('-')[1::])}=={self.version}")
+        name_split = self.name.split('-')
+        self.run(f"pip install -Iv --prefix={self.package_folder} { '-'.join(name_split[1::]) if len(name_split) > 1 else self.name}=={self.version}")
 
 
 class GstRecipe(Recipe):
