@@ -75,6 +75,18 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
         ("bin", r".*"),
         ("libexec", r".*"),
     )
+
+    # Look in the build folder to find a private key to sign the .so files
+    pem_regex = re.compile(r".*\.pem$")
+    pem_file = ""
+    for root, _, files in os.walk(conanfile.build_folder):
+        for file in files:
+            if pem_regex.match(file):
+                if os.path.exists(os.path.join(root, file)):
+                    pem_file = os.path.join(root, file)
+                    print("Found a private key: " + pem_file + "\n not looking for any more keys")
+                    break
+                
     for path in paths:
         regex = re.compile(path[1])
         for root, _, files in os.walk(os.path.join(conanfile.package_folder, path[0])):
@@ -101,9 +113,17 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
                 run("objcopy", ["--only-keep-debug", bin_file, dbg_file])
                 # Strip binary
                 run("strip", ["--strip-debug", "--strip-unneeded", bin_file])
+
                 # Link binary to debug file
                 run("objcopy", [f"--add-gnu-debuglink={dbg_file}", bin_file])
 
+                # find the corresponding .sign file for a .so file and sign it using the pem
+                if os.path.exists(f"{bin_file}.sign"):
+                        if pem_file != "":
+                            print("Signing file: " + bin_file)
+                            run("openssl", ["dgst", "-sha256", "-sign", pem_file, "-out", f"{bin_file}.sign", bin_file])
+                        else:
+                            raise Exception("No private key found for signing the .so file: " + bin_file + "not signing it")
     # Copy sources to package
     regex = re.compile(r".*\.(c|C|cc|cpp|cxx|c\+\+|h|H|hh|hpp|hxx|h\+\+|rs|y|l)$")
     for root, _, files in os.walk(conanfile.build_folder):
