@@ -241,7 +241,7 @@ class Recipe(ConanFile):
             raise Exception(f"meson.build not found: {meson_file}")
         if opt_check:
             opts_data = json.loads(call("meson", ["introspect", "--buildoptions", meson_file]))
-            for (opt_name, opt_val) in opts.items():
+            for opt_name, opt_val in opts.items():
                 opt_data = next(
                     (opt_data for opt_data in opts_data if opt_name == opt_data["name"]),
                     None,
@@ -272,7 +272,7 @@ class Recipe(ConanFile):
                         raise Exception(f"Invalid {opt_name} value: {opt_val}")
                 args.append(f"-D{opt_name}={opt_val}")
         else:
-            for (opt_name, opt_val) in opts.items():
+            for opt_name, opt_val in opts.items():
                 opt_val = str(opt_val)
                 if opt_val == "True":
                     opt_val = "true"
@@ -283,6 +283,7 @@ class Recipe(ConanFile):
         meson = Meson(self)
         meson.configure(
             args,
+            build_folder=os.path.join(source_folder, ".build_folder"),
             source_folder=source_folder,
             pkg_config_paths=os.environ["PKG_CONFIG_PATH"].split(":"),
         )
@@ -489,8 +490,10 @@ class PythonRecipe(Recipe):
 
 class PipRecipe(PythonRecipe):
     def build(self):
-        name_split = self.name.split('-')
-        self.run(f"pip install -Iv --prefix={self.package_folder} { '-'.join(name_split[1::]) if len(name_split) > 1 else self.name}=={self.version}")
+        name_split = self.name.split("-")
+        self.run(
+            f"pip install -Iv --prefix={self.package_folder} { '-'.join(name_split[1::]) if len(name_split) > 1 else self.name}=={self.version}"
+        )
 
 
 class GstRecipe(Recipe):
