@@ -16,20 +16,13 @@ DEVOPS_FILE = "devops.yml"
 
 
 def call(cmd, args, show=False):
-    child = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE)
-    fulloutput = b""
-    while True:
-        output = child.stdout.readline()
-        if output == b"" and child.poll() is not None:
-            break
-        if output:
-            if show:
-                print(output.decode("utf-8"), end="")
-            fulloutput += output
-    fulloutput = fulloutput.decode("utf-8")
-    if child.poll() != 0:
-        raise RuntimeError(" ".join([cmd] + args) + "\n" + fulloutput)
-    return fulloutput
+    child = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = child.communicate()
+    if child.returncode != 0:
+        raise RuntimeError(
+            " ".join([cmd] + args) + "\n" + stdout.decode("utf-8") + "\n" + stderr.decode("utf-8")
+        )
+    return stdout.decode("utf-8")
 
 
 def env_replace(env_var, string, replace=""):
