@@ -484,6 +484,10 @@ class RustRecipe(Recipe):
                     shutil.copy(target_path, os.path.join(dest_path, target))
 
 
+class CppRecipe(Recipe):
+    settings = Recipe.settings + ("compiler",)
+
+
 class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
 
