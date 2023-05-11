@@ -492,6 +492,10 @@ class PythonRecipe(Recipe):
     settings = Recipe.settings + ("python",)
 
 
+class CppPythonRecipe(CppRecipe):
+    settings = CppRecipe.settings + ("python",)
+
+
 class PipRecipe(PythonRecipe):
     def build(self):
         name_split = self.name.split("-")
@@ -502,6 +506,10 @@ class PipRecipe(PythonRecipe):
 
 class GstRecipe(Recipe):
     settings = Recipe.settings + ("gstreamer",)
+
+
+class CppGstRecipe(CppRecipe):
+    settings = CppRecipe.settings + ("gstreamer",)
 
 
 class Project(Recipe):
