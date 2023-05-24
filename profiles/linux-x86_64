@@ -10,7 +10,7 @@ gstreamer=1.22
 rust=1.68
 python=3.8
 hardware=generic
-deployment=False
+deployment=True
 [options]
 [build_requires]
 [env]
