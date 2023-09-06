@@ -413,9 +413,6 @@ class Recipe(ConanFile):
         self.set_env()
         if args is None:
             args = []
-        cache_folder = os.path.join(self.conan_home, "cache", "cargo")
-        if not os.path.exists(cache_folder):
-            os.makedirs(cache_folder)
         if clean:
             for pkg in clean:
                 self.exe("cargo clean -p", [pkg])
@@ -456,7 +453,6 @@ class RustRecipe(Recipe):
             "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
         )
         metadata = json.loads(metadata_raw)
-
         target_folder = metadata["target_directory"]
 
         # Automatically add cdylibs and bins
@@ -541,7 +537,6 @@ class RustProject(Project, RustRecipe):
 
 class GstRustProject(GstProject, RustProject):
     def package(self):
-        target_folder = os.path.join(self.conan_home, "cache", "cargo")
         cargo_toml = os.path.join(self.src, "Cargo.toml")
         if not os.path.exists(cargo_toml):
             return
@@ -550,6 +545,7 @@ class GstRustProject(GstProject, RustProject):
             "cargo", ["metadata", "--format-version=1", "--no-deps", "--manifest-path", cargo_toml]
         )
         metadata = json.loads(metadata_raw)
+        target_folder = metadata["target_directory"]
 
         # (Copy gstreamer elements to lib/streamer-1.0)
         for package in metadata["packages"]:
