@@ -13,6 +13,7 @@ hardware=generic
 deployment=False
 [options]
 gst-plugins-bad:x265=True
+gst-plugins-base:pango=True
 [build_requires]
 [env]
 
