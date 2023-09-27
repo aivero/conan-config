@@ -12,7 +12,6 @@ python=3.8
 hardware=generic
 deployment=False
 [options]
-gst-plugins-base:pango=True
 gst-plugins-bad:x265=True
 [build_requires]
 [env]
